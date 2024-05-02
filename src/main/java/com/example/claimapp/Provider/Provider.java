@@ -1,72 +1,75 @@
 package com.example.claimapp.Provider;
 
-import com.example.claimapp.Claim;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-
-import java.util.List;
-import com.example.claimapp.DataRetriever;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Scanner;
 
 public class Provider {
 
-    public GridPane providerPane() {
-        // Create a grid pane
-        GridPane gridPane = new GridPane();
-        gridPane.setPadding(new Insets(40));
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
+    private String id;
+    private String fullName;
+    private Number phone;
+    private String address;
+    private String email;
+    private String password;
 
-        // Add labels, text fields, and buttons
-        // Add labels, text fields, and buttons
-        Label titleLabel = new Label("Claim Management System");
-        titleLabel.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;"); // Optional styling
-        titleLabel.setAlignment(Pos.CENTER); // Align center
-
-
-        Label claimsLabel = new Label("Get all claims:");
-        claimsLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
-        Button getClaimsButton = new Button("Get all claims");
-        getClaimsButton.setPrefWidth(100);
-
-
-        // Add components to the grid pane
-        gridPane.add(titleLabel, 0, 0, 2, 1);
-        gridPane.add(claimsLabel, 0, 1);
-        gridPane.add(getClaimsButton, 1, 1);
-        GridPane.setHalignment(getClaimsButton, javafx.geometry.HPos.RIGHT);
-        Insets buttonMargin = new Insets(0, 10, 0, 0);
-        GridPane.setMargin(getClaimsButton, buttonMargin);
-        gridPane.setGridLinesVisible(false);
-
-        // set action for the getClaimsButton
-        getClaimsButton.setOnAction(e -> {
-            // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
-            DataRetriever dataRetriever = new DataRetriever();
-            List<Claim> allClaims = dataRetriever.retrieveAllClaimsFromDatabase(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
-
-            // Step 2: Format the claims data into a suitable format for display on the UI
-            StringBuilder formattedClaims = new StringBuilder();
-            for (Claim claim : allClaims) {
-                formattedClaims.append(claim.toString()).append("\n"); // Assuming toString() provides a suitable representation of the claim
-            }
-
-            // Step 3: Update the UI to display the formatted claims data
-            TextArea claimsTextArea = new TextArea();
-            claimsTextArea.setText(formattedClaims.toString());
-            // Assuming you have a GridPane named gridPane where you want to display the claims
-            gridPane.add(claimsTextArea, 0, 2, 2, 1);
-        });
-
-
-        // Set alignment of the GridPane to center
-        gridPane.setAlignment(Pos.CENTER);
-        return gridPane;
+    public Provider() {
+        this.id = "default";
+        this.fullName = "default";
+        this.phone = null;
+        this.address = null;
+        this.email = null;
+        this.password = null;
     }
 
+    public Provider(String id, String fullName, Number phone, String address, String email, String password) {
+        this.id = id;
+        this.fullName = fullName;
+        this.phone = phone;
+        this.address = address;
+        this.email = email;
+        this.password = password;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public Number getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Number phone) {
+        this.phone = phone;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
 }
