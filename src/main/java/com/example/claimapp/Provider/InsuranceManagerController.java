@@ -9,7 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 
 import java.util.List;
-import com.example.claimapp.DataRetriever;
+import com.example.claimapp.DataManager;
 
 
 public class InsuranceManagerController {
@@ -46,8 +46,8 @@ public class InsuranceManagerController {
         // set action for the getClaimsButton
         getClaimsButton.setOnAction(e -> {
             // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
-            DataRetriever dataRetriever = new DataRetriever();
-            List<Claim> allClaims = dataRetriever.retrieveAllClaimsFromDatabase(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
+            DataManager dataRetriever = new DataManager();
+            List<Claim> allClaims = dataRetriever.getAllClaims(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
 
             // Step 2: Format the claims data into a suitable format for display on the UI
             StringBuilder formattedClaims = new StringBuilder();

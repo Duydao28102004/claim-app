@@ -1,7 +1,7 @@
 package com.example.claimapp.Provider;
 
 import com.example.claimapp.Claim;
-import com.example.claimapp.DataRetriever;
+import com.example.claimapp.DataManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -46,7 +46,7 @@ public class InsuranceSurveyorController {
         // set action for the getClaimsButton
         getClaimsButton.setOnAction(e -> {
             // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
-            DataRetriever dataRetriever = new DataRetriever();
+            DataManager dataRetriever = new DataManager();
             List<Claim> allClaims = dataRetriever.retrieveAllClaimsFromDatabase(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
 
             // Step 2: Format the claims data into a suitable format for display on the UI
