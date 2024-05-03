@@ -30,9 +30,8 @@ public class Main extends Application {
         ArrayList<PolicyHolder> policyHolders = new ArrayList<>();
         ArrayList<Claim> claims = new ArrayList<>();
         Authentication authentication = new Authentication();
-        GridPane loginPane = authentication.loginPane();
         // Create scene and set it on the stage
-        Scene scene = new Scene(loginPane, 500, 300);
+        Scene scene = new Scene(authentication.loginPane(stage), 500, 300);
         stage.setTitle("Claim Management System - Authentication");
         stage.setScene(scene);
         stage.show();
