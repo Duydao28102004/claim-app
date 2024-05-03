@@ -1,7 +1,7 @@
 package com.example.claimapp.Provider;
 
 import com.example.claimapp.Claim;
-import com.example.claimapp.DataManager;
+import com.example.claimapp.Customer.Customer;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -33,6 +33,10 @@ public class InsuranceSurveyorController {
         Button getClaimsButton = new Button("Get all claims");
         getClaimsButton.setPrefWidth(100);
 
+        Label customersLabel = new Label("Get all customers:");
+        customersLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
+        Button getCustomersButton = new Button("Get all customers");
+        getCustomersButton.setPrefWidth(150);
 
         // Add components to the grid pane
         gridPane.add(titleLabel, 0, 0, 2, 1);
@@ -41,13 +45,17 @@ public class InsuranceSurveyorController {
         GridPane.setHalignment(getClaimsButton, javafx.geometry.HPos.RIGHT);
         Insets buttonMargin = new Insets(0, 10, 0, 0);
         GridPane.setMargin(getClaimsButton, buttonMargin);
+        gridPane.add(customersLabel, 0, 2);
+        gridPane.add(getCustomersButton, 1, 2);
+        GridPane.setHalignment(getCustomersButton, javafx.geometry.HPos.RIGHT);
+        GridPane.setMargin(getCustomersButton, buttonMargin);
         gridPane.setGridLinesVisible(false);
 
         // set action for the getClaimsButton
         getClaimsButton.setOnAction(e -> {
             // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
-            DataManager dataRetriever = new DataManager();
-            List<Claim> allClaims = dataRetriever.retrieveAllClaimsFromDatabase(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
+            ProviderManager dataRetriever = new ProviderManager();
+            List<Claim> allClaims = dataRetriever.getAllClaims(); // Assuming retrieveAllClaimsFromDatabase() returns a List<Claim>
 
             // Step 2: Format the claims data into a suitable format for display on the UI
             StringBuilder formattedClaims = new StringBuilder();
@@ -62,6 +70,24 @@ public class InsuranceSurveyorController {
             gridPane.add(claimsTextArea, 0, 2, 2, 1);
         });
 
+        // set action for the getCustomersButton
+        getCustomersButton.setOnAction(e -> {
+            // Step 1: Retrieve all the customers from the database (replace this with your actual database retrieval logic)
+            ProviderManager dataRetriever = new ProviderManager();
+            List<Customer> allCustomers = dataRetriever.getAllCustomers(); // Assuming getAllCustomers() returns a List<Customer>
+
+            // Step 2: Format the customers data into a suitable format for display on the UI
+            StringBuilder formattedCustomers = new StringBuilder();
+            for (Customer customer : allCustomers) {
+                formattedCustomers.append(customer.toString()).append("\n"); // Assuming toString() provides a suitable representation of the customer
+            }
+
+            // Step 3: Update the UI to display the formatted customers data
+            TextArea customersTextArea = new TextArea();
+            customersTextArea.setText(formattedCustomers.toString());
+            // Assuming you have a GridPane named gridPane where you want to display the customers
+            gridPane.add(customersTextArea, 0, 5, 2, 1);
+        });
 
         // Set alignment of the GridPane to center
         gridPane.setAlignment(Pos.CENTER);

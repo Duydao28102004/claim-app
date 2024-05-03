@@ -1,14 +1,24 @@
 package com.example.claimapp;
 
+import com.example.claimapp.Provider.InsuranceManagerController;
+import com.example.claimapp.Provider.InsuranceSurveyorController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+import java.util.function.Consumer;
+
 public class Authentication {
+    private Consumer<Scene> loginCallback;
+
+    public void setLoginCallback(Consumer<Scene> loginCallback) {
+        this.loginCallback = loginCallback;
+    }
     public GridPane loginPane() {
         // Create a grid pane
         GridPane gridPane = new GridPane();
@@ -49,10 +59,19 @@ public class Authentication {
             // Handle login action here
             String username = usernameField.getText();
             String password = passwordField.getText();
-            // Validate username and password
-            if ("admin".equals(username) && "password".equals(password)) {
-                System.out.println("Authentication successful!");
-                // Open main application window or perform other actions
+            // Execute the login callback with the username
+            if ("insurancemanager".equals(username) && "m-password".equals(password)) {
+                InsuranceManagerController managerController = new InsuranceManagerController();
+                Scene scene = new Scene(managerController.insuranceManagerPane(), 600, 400);
+                if (loginCallback != null) {
+                    loginCallback.accept(scene);
+                }
+            } else if ("surveyor".equals(username) && "s-password".equals(password)) {
+                InsuranceSurveyorController surveyorController = new InsuranceSurveyorController();
+                Scene scene = new Scene(surveyorController.insuranceSurveyorPane(), 600, 400);
+                if (loginCallback != null) {
+                    loginCallback.accept(scene);
+                }
             } else {
                 System.out.println("Invalid username or password. Please try again.");
                 // Show error message or perform other actions
