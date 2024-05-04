@@ -52,4 +52,8 @@ public class PolicyOwnerManager {
 
         return policyOwnerMenu;
     }
+
+//    public GridPane viewPolicyHolders(Stage stage) {
+//        FileManager fileManager = new FileManager("jdbc:postgresql://ep-bitter-firefly-a1234bmn.ap-southeast-1.aws.neon.tech/claim-app?user=claim-app_owner&password=VZw2xWjlAL");
+//    }
 }

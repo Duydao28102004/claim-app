@@ -17,18 +17,16 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.*;
 import java.util.ArrayList;
-
+import java.util.Random;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage stage) throws IOException {
-        FileManager fileManager = new FileManager();
-        ArrayList<Dependent> dependents = new ArrayList<>();
-        ArrayList<InsuranceCard> insuranceCards = new ArrayList<>();
-        ArrayList<PolicyHolder> policyHolders = new ArrayList<>();
-        ArrayList<Claim> claims = new ArrayList<>();
+    public void start(Stage stage) throws IOException, ClassNotFoundException {
+        Class.forName("org.sqlite.JDBC");
+        FileManager fileManager = new FileManager("jdbc:postgresql://ep-bitter-firefly-a1234bmn.ap-southeast-1.aws.neon.tech/claim-app?user=claim-app_owner&password=VZw2xWjlAL7C&sslmode=require");
         Authentication authentication = new Authentication();
         // Create scene and set it on the stage
         Scene scene = new Scene(authentication.loginPane(stage), 500, 300);
