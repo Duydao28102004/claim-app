@@ -2,18 +2,10 @@ package com.example.claimapp.Provider;
 
 import com.example.claimapp.Claim;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import com.example.claimapp.Customer.Customer;
-import com.google.gson.Gson;
+import com.example.claimapp.InsuranceCard;
 
 
 public class ProviderManager {
@@ -23,155 +15,58 @@ public class ProviderManager {
 
     // Rest of the class implementation...
 
-    public List<Claim> getAllClaims() {
-        List<Claim> claims = new ArrayList<>();
+    private ArrayList<Claim> claims = new ArrayList<>();
+    private ArrayList<Customer> customers = new ArrayList<>();
 
-        try {
-            // Construct the URL for the API endpoint
-            String apiUrl = SUPABASE_URL + "/rest/v1/Claim"; // Assuming "claims" is the table name
+    public ProviderManager() {
+        initializeSampleData();
+    }
 
-            // Open a connection to the Supabase API
-            URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("apikey", SUPABASE_KEY);
+    private void initializeSampleData() {
+        // Sample claims
+        claims.add(new Claim("Claim-1", new Date("11/11/11111"), "John Doe", "1234-5678-9012-3456", new Date(), new ArrayList<>(), 1000.00, "Pending", "BankInfo: ABCBank_123456789"));
+        claims.add(new Claim("Claim-2", new Date("22/22/2222"), "Jane Smith", "2345-6789-0123-4567", new Date(), new ArrayList<>(), 1500.00, "Pending", "BankInfo: XYZ_987654321"));
 
-            // Retrieve the response
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            reader.close();
+        // Sample customers
+        customers.add(new Customer("c-1111111", "John Doe", new InsuranceCard(), null));
+        customers.add(new Customer("c-2222222", "Jane Smith", new InsuranceCard(), null));
+    }
 
-            // Parse the response JSON using Gson
-            Gson gson = new Gson();
-            Claim[] claimsArray = gson.fromJson(response.toString(), Claim[].class);
-            claims.addAll(Arrays.asList(claimsArray));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    public ArrayList<Claim> getAllClaims() {
         return claims;
     }
 
-    public List<Customer> getAllCustomers() {
-        List<Customer> customers = new ArrayList<>();
-
-        try {
-            // Construct the URLs for the API endpoints
-            String policyHoldersUrl = SUPABASE_URL + "/rest/v1/PolicyHolder";
-            String dependentsUrl = SUPABASE_URL + "/rest/v1/Dependent";
-
-            // Retrieve policy holders
-            List<Customer> policyHolders = queryCustomers(policyHoldersUrl);
-
-            // Retrieve dependents
-            List<Customer> dependents = queryCustomers(dependentsUrl);
-
-            // Combine the lists
-            customers.addAll(policyHolders);
-            customers.addAll(dependents);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return customers;
-    }
-
-    private List<Customer> queryCustomers(String apiUrl) throws Exception {
-        List<Customer> customers = new ArrayList<>();
-
-        // Open a connection to the Supabase API
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setRequestProperty("apikey", SUPABASE_KEY);
-
-        // Retrieve the response
-        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            response.append(line);
-        }
-        reader.close();
-
-        // Parse the response JSON using Gson
-        Gson gson = new Gson();
-        Customer[] customersArray = gson.fromJson(response.toString(), Customer[].class);
-        customers.addAll(Arrays.asList(customersArray));
-
+    public ArrayList<Customer> getAllCustomers() {
         return customers;
     }
 
     public Claim getSpecificClaim(String claimId) {
-        Claim claim = null;
-
-        try {
-            // Construct the URL for the API endpoint to fetch the specific claim
-            String apiUrl = SUPABASE_URL + "/rest/v1/Claim?id=eq." + claimId; // Assuming "Claim" is the table name
-
-            // Open a connection to the Supabase API
-            URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("apikey", SUPABASE_KEY);
-
-            // Retrieve the response
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+        for (Claim claim : claims) {
+            if (claim.getId().equals(claimId)) {
+                return claim;
             }
-            reader.close();
-
-            // Parse the response JSON using Gson
-            Gson gson = new Gson();
-            claim = gson.fromJson(response.toString(), Claim.class);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-        return claim;
+        return null; // Return null if claim with the specified ID is not found
     }
 
     public Customer getSpecificCustomer(String customerName) {
-        Customer specificCustomer = null;
-
-        try {
-            // Construct the URL for the API endpoint
-            String apiUrl = SUPABASE_URL + "/rest/v1/Customer?select=*&customerName=eq." + customerName;
-
-            // Open a connection to the Supabase API
-            URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setRequestProperty("apikey", SUPABASE_KEY);
-
-            // Retrieve the response
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+        for (Customer customer : customers) {
+            if (customer.getFullName().equals(customerName)) {
+                return customer;
             }
-            reader.close();
-
-            // Parse the response JSON using Gson
-            Gson gson = new Gson();
-            specificCustomer = gson.fromJson(response.toString(), Customer.class);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-        return specificCustomer;
+        return null; // Return null if customer with the specified name is not found
     }
 
+    // Function to arrange claims from the latest to earliest creation date
+    public List<Claim> claimLatestToEarliest(List<Claim> claims) {
+        claims.sort(Comparator.comparing(Claim::getClaimDate).reversed());
+        return claims;
+    }
+
+    // Function to arrange claims from the earliest to latest creation date
+    public List<Claim> claimEarliestToLatest(List<Claim> claims) {
+        claims.sort(Comparator.comparing(Claim::getClaimDate));
+        return claims;
+    }
 }

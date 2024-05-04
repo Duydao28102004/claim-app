@@ -114,4 +114,10 @@ public class Claim {
     public void setBankingInfo(String bankingInfo) {
         this.bankingInfo = bankingInfo;
     }
+
+    @Override
+    public String toString() {
+        return "Claim ID: " + id + ", Claim Date: " + claimDate + ", Insured Person: " + insuredPerson + "Card Number: " + cardNumber
+                + "Exam Date: " + examDate + "Documents: " + documents + "Claim Amount: " + claimAmount + "Status: " + status + "Banking Info: " + bankingInfo;
+    }
 }

@@ -2,15 +2,16 @@ package com.example.claimapp.Provider;
 
 import com.example.claimapp.Claim;
 import com.example.claimapp.Customer.Customer;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -35,6 +36,12 @@ public class InsuranceManagerController {
         Button getClaimsButton = new Button("Get all claims");
         getClaimsButton.setPrefWidth(100);
 
+        Label sortingLabel = new Label("Sort claims:");
+        sortingLabel.setStyle("-fx-font-size: 15px;");
+        ChoiceBox<String> sortingChoiceBox = new ChoiceBox<>();
+        sortingChoiceBox.getItems().addAll("Default", "Latest to Earliest", "Earliest to Latest");
+        sortingChoiceBox.setValue("Default");
+
         Label customersLabel = new Label("Get all customers:");
         customersLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
         Button getCustomersButton = new Button("Get all customers");
@@ -43,18 +50,23 @@ public class InsuranceManagerController {
         Label specificClaimLabel = new Label("Enter Claim ID:");
         TextField claimIdField = new TextField();
         Button getSpecificClaimButton = new Button("Get Specific Claim");
+        getSpecificClaimButton.setPrefWidth(200);
 
         Label specificCustomerLabel = new Label("Get specific customer:");
         TextField customerNameField = new TextField();
         Button getSpecificCustomerButton = new Button("Get customer");
+        getSpecificCustomerButton.setPrefWidth(250);
 
         // Add components to the grid pane
         gridPane.add(titleLabel, 0, 0, 2, 1);
         gridPane.add(claimsLabel, 0, 1);
         gridPane.add(getClaimsButton, 1, 1);
         GridPane.setHalignment(getClaimsButton, javafx.geometry.HPos.RIGHT);
-        Insets buttonMargin = new Insets(0, 10, 0, 0);
+        Insets buttonMargin = new Insets(0, 10, 5, 2);
         GridPane.setMargin(getClaimsButton, buttonMargin);
+
+        gridPane.add(sortingLabel, 2, 1);
+        gridPane.add(sortingChoiceBox, 3, 1);
 
         gridPane.add(customersLabel, 0, 2);
         gridPane.add(getCustomersButton, 1, 2);
@@ -91,8 +103,68 @@ public class InsuranceManagerController {
             TextArea claimsTextArea = new TextArea();
             claimsTextArea.setText(formattedClaims.toString());
             // Assuming you have a GridPane named gridPane where you want to display the claims
-            gridPane.add(claimsTextArea, 0, 4, 2, 1);
+            gridPane.add(claimsTextArea, 0, 5, 2, 1);
         });
+
+
+        // Set action for the sortingChoiceBox
+        sortingChoiceBox.setOnAction(e -> {
+            String selectedSortOption = sortingChoiceBox.getValue();
+            switch (selectedSortOption) {
+                case "Latest to Earliest":
+                    // Step 1: Retrieve all the claims from the database
+                    ProviderManager dataRetriever = new ProviderManager();
+                    List<Claim> allClaims = dataRetriever.getAllClaims();
+
+                    // Step 2: Sort the claims from the latest to earliest creation date
+                    List<Claim> sortedClaimsLatestToEarliest = dataRetriever.claimLatestToEarliest(allClaims);
+
+                    // Step 3: Format the sorted claims data into a suitable format for display on the UI
+                    StringBuilder formattedSortedClaims = new StringBuilder();
+                    for (Claim claim : sortedClaimsLatestToEarliest) {
+                        formattedSortedClaims.append(claim.toString()).append("\n");
+                    }
+
+                    // Step 4: Update the UI to display the formatted sorted claims data
+                    TextArea sortedClaimsTextArea = new TextArea();
+                    sortedClaimsTextArea.setText(formattedSortedClaims.toString());
+                    clearTextArea(gridPane); // Clear existing text area before adding the sorted claims
+                    gridPane.add(sortedClaimsTextArea, 0, 5, 2, 1);
+                    break;
+
+                case "Earliest to Latest":
+                    // Similar steps as above, but using claimEarliestToLatest function
+                    // Step 1: Retrieve all the claims from the database
+                    dataRetriever = new ProviderManager();
+                    List<Claim> allClaimsEarliestToLatest = dataRetriever.getAllClaims();
+
+                    // Step 2: Sort the claims from the earliest to latest creation date
+                    List<Claim> sortedClaimsEarliestToLatest = dataRetriever.claimEarliestToLatest(allClaimsEarliestToLatest);
+
+                    // Step 3: Format the sorted claims data into a suitable format for display on the UI
+                    StringBuilder formattedSortedClaimsEarliestToLatest = new StringBuilder();
+                    for (Claim claim : sortedClaimsEarliestToLatest) {
+                        formattedSortedClaimsEarliestToLatest.append(claim.toString()).append("\n");
+                    }
+
+                    // Step 4: Update the UI to display the formatted sorted claims data
+                    TextArea sortedClaimsEarliestToLatestTextArea = new TextArea();
+                    sortedClaimsEarliestToLatestTextArea.setText(formattedSortedClaimsEarliestToLatest.toString());
+                    clearTextArea(gridPane); // Clear existing text area before adding the sorted claims
+                    gridPane.add(sortedClaimsEarliestToLatestTextArea, 0, 5, 2, 1);
+                    break;
+
+                case "Default":
+                    // Implement default behavior or do nothing if no sorting is required
+                    break;
+
+                default:
+                    // Handle invalid selection
+                    break;
+            }
+        });
+
+
 
         // set action for the getCustomersButton
         getCustomersButton.setOnAction(e -> {
@@ -110,7 +182,7 @@ public class InsuranceManagerController {
             TextArea customersTextArea = new TextArea();
             customersTextArea.setText(formattedCustomers.toString());
             // Assuming you have a GridPane named gridPane where you want to display the customers
-            gridPane.add(customersTextArea, 0, 5, 2, 1);
+            gridPane.add(customersTextArea, 0, 6, 2, 1);
         });
 
         // Set action for the getSpecificClaimButton
@@ -122,37 +194,48 @@ public class InsuranceManagerController {
 
                 if (specificClaim != null) {
                     // Display the specific claim information
-                    Text claimInfoText = new Text("Claim Information:\n" + specificClaim.toString());
-                    gridPane.add(claimInfoText, 0, 3, 3, 1);
+                    TextArea claimInfoText = new TextArea();
+                    claimInfoText.setText("Claim Information:\n" + specificClaim.toString());
+                    gridPane.add(claimInfoText, 0, 7, 2, 1);
                 } else {
                     // Claim with the provided ID not found
-                    Text claimNotFoundText = new Text("Claim with ID " + claimId + " not found.");
-                    gridPane.add(claimNotFoundText, 0, 3, 3, 1);
+                    TextArea claimNotFoundText = new TextArea();
+                    claimNotFoundText.setText("Claim with ID " + claimId + " not found.");
+                    gridPane.add(claimNotFoundText, 0, 7, 2, 1);
                 }
             } else {
                 // Show an error message if claim ID field is empty
-                Text errorText = new Text("Please enter a valid Claim ID.");
-                gridPane.add(errorText, 0, 3, 3, 1);
+                TextArea errorText = new TextArea();
+                errorText.setText("Please enter a valid Claim ID.");
+                gridPane.add(errorText, 0, 7, 3, 1);
             }
         });
 
         // Set action for the getCustomerButton
         getSpecificCustomerButton.setOnAction(e -> {
             String customerName = customerNameField.getText();
-            ProviderManager dataRetriever = new ProviderManager();
-            Customer specificCustomer = dataRetriever.getSpecificCustomer(customerName);
 
-            if (specificCustomer != null) {
-                // Display the customer details
-                TextArea customerTextArea = new TextArea();
-                customerTextArea.setText(specificCustomer.toString());
-                gridPane.add(customerTextArea, 0, 2, 3, 1);
-            } else {
-                // Handle case where customer is not found
-                TextArea customerNotFoundTextArea = new TextArea();
-                customerNotFoundTextArea.setText("Customer not found.");
-                gridPane.add(customerNotFoundTextArea, 0, 2, 3, 1);
-            }
+           if (!customerName.isEmpty()) {
+               ProviderManager dataRetriever = new ProviderManager();
+               Customer specificCustomer = dataRetriever.getSpecificCustomer(customerName);
+
+               if (specificCustomer != null) {
+                   // Display the customer details
+                   TextArea customerTextArea = new TextArea();
+                   customerTextArea.setText(specificCustomer.toString());
+                   gridPane.add(customerTextArea, 0, 8, 3, 1);
+               } else {
+                   // Handle case where customer is not found
+                   TextArea customerNotFoundTextArea = new TextArea();
+                   customerNotFoundTextArea.setText("Customer not found.");
+                   gridPane.add(customerNotFoundTextArea, 0, 8, 3, 1);
+               }
+           } else {
+               // Show an error message if claim ID field is empty
+               TextArea errorText = new TextArea();
+               errorText.setText("Please enter a valid Claim ID.");
+               gridPane.add(errorText, 0, 8, 3, 1);
+           }
         });
 
         // Set alignment of the GridPane to center
@@ -160,5 +243,16 @@ public class InsuranceManagerController {
         return gridPane;
     }
 
+    private void clearTextArea(GridPane gridPane) {
+        ObservableList<Node> nodesToRemove = FXCollections.observableArrayList();
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) >= 4) {
+                // Remove the node if it is in the specified area of the grid pane
+                nodesToRemove.add(node);
+            }
+        }
+        // Remove all nodes in the specified area
+        gridPane.getChildren().removeAll(nodesToRemove);
+    }
 
 }
