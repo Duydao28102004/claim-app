@@ -153,11 +153,6 @@ public class InsuranceManagerController {
                     clearTextArea(gridPane); // Clear existing text area before adding the sorted claims
                     gridPane.add(sortedClaimsEarliestToLatestTextArea, 0, 5, 2, 1);
                     break;
-
-                case "Default":
-                    // Implement default behavior or do nothing if no sorting is required
-                    break;
-
                 default:
                     // Handle invalid selection
                     break;
