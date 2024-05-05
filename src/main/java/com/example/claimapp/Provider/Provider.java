@@ -1,15 +1,10 @@
 package com.example.claimapp.Provider;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Scanner;
-
 public class Provider {
 
     private String id;
     private String fullName;
-    private Number phone;
+    private String phone;
     private String address;
     private String email;
     private String password;
@@ -23,7 +18,7 @@ public class Provider {
         this.password = null;
     }
 
-    public Provider(String id, String fullName, Number phone, String address, String email, String password) {
+    public Provider(String id, String fullName, String phone, String address, String email, String password) {
         this.id = id;
         this.fullName = fullName;
         this.phone = phone;
@@ -40,11 +35,11 @@ public class Provider {
         return fullName;
     }
 
-    public Number getPhone() {
+    public String getPhone() {
         return phone;
     }
 
-    public void setPhone(Number phone) {
+    public void setPhone(String phone) {
         this.phone = phone;
     }
 

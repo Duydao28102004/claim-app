@@ -11,7 +11,7 @@ public class InsuranceManager extends Provider{
         insuranceSurveyors = null;
     }
 
-    public InsuranceManager(String id, String fullName, Number phone, String address, String email, String password, ArrayList<InsuranceSurveyor> insuranceSurveyors) {
+    public InsuranceManager(String id, String fullName, String phone, String address, String email, String password, ArrayList<InsuranceSurveyor> insuranceSurveyors) {
         super(id, fullName, phone, address, email, password);
         this.insuranceSurveyors = insuranceSurveyors;
     }
@@ -23,5 +23,6 @@ public class InsuranceManager extends Provider{
     public void addSurveyor(InsuranceSurveyor surveyor) {
         insuranceSurveyors.add(surveyor);
     }
+
 
 }
