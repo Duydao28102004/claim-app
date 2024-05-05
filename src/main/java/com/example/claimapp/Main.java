@@ -25,7 +25,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException, ClassNotFoundException {
-        Class.forName("org.sqlite.JDBC");
         FileManager fileManager = new FileManager("jdbc:postgresql://ep-bitter-firefly-a1234bmn.ap-southeast-1.aws.neon.tech/claim-app?user=claim-app_owner&password=VZw2xWjlAL7C&sslmode=require");
         Authentication authentication = new Authentication();
         // Create scene and set it on the stage
