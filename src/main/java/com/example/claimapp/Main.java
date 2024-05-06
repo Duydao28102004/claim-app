@@ -24,8 +24,14 @@ import java.util.Random;
 public class Main extends Application {
 
     @Override
-    public void start(Stage stage) throws IOException, ClassNotFoundException {
+    public void start(Stage stage) throws IOException {
         FileManager fileManager = new FileManager("jdbc:postgresql://ep-bitter-firefly-a1234bmn.ap-southeast-1.aws.neon.tech/claim-app?user=claim-app_owner&password=VZw2xWjlAL7C&sslmode=require");
+        ArrayList<Dependent> dependents;
+        dependents = FileManager.dependentReader();
+        for (Dependent dependent: dependents) {
+            System.out.println(dependent);
+        }
+        FileManager.dependentWriter(dependents);
         Authentication authentication = new Authentication();
         // Create scene and set it on the stage
         Scene scene = new Scene(authentication.loginPane(stage), 500, 300);

@@ -17,7 +17,7 @@ public class Dependent extends Customer {
         policyHolder = "null";
     }
 
-    public Dependent(String id, String fullName, InsuranceCard insuranceCard, ArrayList<Claim> claims, String policyHolder) {
+    public Dependent(String id, String fullName, String insuranceCard, ArrayList<String> claims, String policyHolder) {
         super(id, fullName, insuranceCard, claims);
         this.policyHolder = policyHolder;
     }
@@ -28,5 +28,16 @@ public class Dependent extends Customer {
 
     public void setPolicyHolder(String policyHolder) {
         this.policyHolder = policyHolder;
+    }
+
+    @Override
+    public String toString() {
+        return "Dependent{" +
+                "id='" + getId() + '\'' +
+                ", fullName='" + getFullName() + '\'' +
+                ", insuranceCard='" + getInsuranceCard() + '\'' +
+                ", claims='" + getClaims() + '\'' +
+                ", policyHolder='" + policyHolder + '\'' +
+                '}';
     }
 }
