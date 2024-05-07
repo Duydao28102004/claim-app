@@ -1,130 +1,288 @@
 package com.example.claimapp;
 
-/**
- * @author <Dao Bao Duy - s3978826>
- *     Adapted from: chatGPT, w3schools
- */
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.example.claimapp.Customer.Dependent;
 import com.example.claimapp.Customer.PolicyHolder;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+
+import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class FileManager {
-    public void fileWriter(Object object, String fileName) {
-        // Convert object to JSON string
-        String folderPath = "./data/";
-        createNewFile(folderPath, fileName);
-        Gson gson = new Gson();
-        String json = gson.toJson(object);
-        try (FileWriter writer = new FileWriter(folderPath + fileName, false)) {
-            // Write JSON string to file
-            writer.write(json);
-            System.out.println("Object written to " + fileName + " successfully!");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static String jdbcUrl;
+
+    public FileManager(String jdbcUrl) {
+        this.jdbcUrl = jdbcUrl;
     }
-    private void createNewFile(String folderPath, String fileName) {
-        File file = new File(folderPath + fileName);
-        if (file.exists()) {
-            System.out.println( fileName + " exists in the folder.");
-        } else {
-            // Create a new file if it does not exist
-            System.out.println("The file does not exist in the folder.");
-            System.out.println("Creating a new file...");
-            try {
-                file.createNewFile();
-                // Add square brackets to the new JSON file
-                FileWriter writer = new FileWriter(file);
-                writer.write("[]"); // Write square brackets to the file to store array list
-                writer.close();
-                System.out.println("The file is created.");
-            } catch (Exception e) {
-                System.out.println("An error occurred.");
-                e.printStackTrace();
+
+    public static void policyHolderWriter(ArrayList<PolicyHolder> policyHolders) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM PolicyHolder";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO PolicyHolder (id, fullName, insuranceCard, claims, dependents) VALUES (?, ?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (PolicyHolder policyHolder : policyHolders) {
+                ArrayList<String> claims = policyHolder.getClaims();
+                String claimsString = String.join(",", claims);
+
+                ArrayList<String> dependents = policyHolder.getDependents();
+                String dependentsString = String.join(",", dependents);
+
+                insertStatement.setString(1, policyHolder.getId());
+                insertStatement.setString(2, policyHolder.getFullName());
+                insertStatement.setString(3, policyHolder.getInsuranceCard());
+                insertStatement.setString(4, claimsString);
+                insertStatement.setString(5, dependentsString);
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
             }
-        }
-    }
-    public ArrayList<Claim> claimReader() {
-        // Create a new Gson object
-        Gson gson = new Gson();
-        String folderPath = "./data/";
-        String fileName = "claim.json";
-        createNewFile(folderPath, fileName);
-        // Read JSON file
-        try (FileReader reader = new FileReader(folderPath + fileName)) {
-            // Convert JSON array to list of claims
-            TypeToken<ArrayList<Claim>> collectionType = new TypeToken<ArrayList<Claim>>(){};
-            ArrayList<Claim> claims = gson.fromJson(reader, collectionType);
-            System.out.println("Object read from file successfully!");
-            return claims;
-        } catch (IOException e) {
-            // Print the error message
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
             e.printStackTrace();
-            return null;
-        }
-    }
-    public ArrayList<Dependent> dependentReader() {
-        // Create a new Gson object
-        Gson gson = new Gson();
-        String folderPath = "./data/";
-        String fileName = "dependent.json";
-        createNewFile(folderPath, fileName);
-        try (FileReader reader = new FileReader(folderPath + fileName)) {
-            // Read JSON file and convert it to list of dependents
-            TypeToken<ArrayList<Dependent>> collectionType = new TypeToken<ArrayList<Dependent>>(){};
-            ArrayList<Dependent> dependents = gson.fromJson(reader, collectionType);
-            System.out.println("Object read from file successfully!");
-            return dependents;
-        } catch (IOException e) {
-            // Print the error message
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public ArrayList<PolicyHolder> policyHolderReader() {
-        // Create a new Gson object
-        Gson gson = new Gson();
-        String folderPath = "./data/";
-        String fileName = "policyHolder.json";
-        createNewFile(folderPath, fileName);
-        try (FileReader reader = new FileReader(folderPath + fileName)) {
-            // Read JSON file and convert it to list of policy holders
-            TypeToken<ArrayList<PolicyHolder>> collectionType = new TypeToken<ArrayList<PolicyHolder>>(){};
-            ArrayList<PolicyHolder> policyHolders = gson.fromJson(reader, collectionType);
-            System.out.println("Object read from file successfully!");
-            return policyHolders;
-        } catch (IOException e) {
-            // Print the error message
-            e.printStackTrace();
-            return null;
-        }
-    }
-    public ArrayList<InsuranceCard> insuranceCardReader() {
-        // Create a new Gson object
-        Gson gson = new Gson();
-        String folderPath = "./data/";
-        String fileName = "insuranceCard.json";
-        createNewFile(folderPath, fileName);
-        try (FileReader reader = new FileReader(folderPath + fileName)) {
-            // Read JSON file and convert it to list of insurance cards
-            TypeToken<ArrayList<InsuranceCard>> collectionType = new TypeToken<ArrayList<InsuranceCard>>(){};
-            ArrayList<InsuranceCard> insuranceCards = gson.fromJson(reader, collectionType);
-            System.out.println("Object read from file successfully!");
-            return insuranceCards;
-        } catch (IOException e) {
-            //  Print the error message
-            e.printStackTrace();
-            return null;
         }
     }
 
+    public static ArrayList<PolicyHolder> policyHolderReader() {
+        ArrayList<PolicyHolder> policyHolders = new ArrayList<>();
 
+        String selectSql = "SELECT id, fullName, insuranceCard, claims, dependents FROM PolicyHolder";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String fullName = resultSet.getString("fullName");
+                String insuranceCard = resultSet.getString("insuranceCard");
+                String claimsString = resultSet.getString("claims");
+                String dependentsString = resultSet.getString("dependents");
+
+                ArrayList<String> claims = new ArrayList<>(Arrays.asList(insuranceCard.split(",")));
+                ArrayList<String> dependents = new ArrayList<>(Arrays.asList(dependentsString.split(",")));
+
+                PolicyHolder policyHolder = new PolicyHolder(id, fullName, insuranceCard, claims, dependents);
+
+                policyHolders.add(policyHolder);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return policyHolders;
+    }
+
+    public static void dependentWriter(ArrayList<Dependent> dependents) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM Dependent";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO Dependent (id, fullName, insuranceCard, claims, policyHolder) VALUES (?, ?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (Dependent dependent : dependents) {
+                ArrayList<String> claims = dependent.getClaims();
+                String claimsString = String.join(",", claims);
+
+                insertStatement.setString(1, dependent.getId());
+                insertStatement.setString(2, dependent.getFullName());
+                insertStatement.setString(3, dependent.getInsuranceCard());
+                insertStatement.setString(4, claimsString);
+                insertStatement.setString(5, dependent.getPolicyHolder());
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Dependent> dependentReader() {
+        ArrayList<Dependent> dependents = new ArrayList<>();
+
+        String selectSql = "SELECT id, fullName, insuranceCard, claims, policyHolder FROM Dependent";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String fullName = resultSet.getString("fullName");
+                String insuranceCard = resultSet.getString("insuranceCard");
+                String claimsString = resultSet.getString("claims");
+                String policyHolder = resultSet.getString("policyHolder");
+
+                ArrayList<String> claims = new ArrayList<>(Arrays.asList(claimsString.split(",")));
+
+                Dependent dependent = new Dependent(id, fullName, insuranceCard, claims, policyHolder);
+
+                dependents.add(dependent);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return dependents;
+    }
+
+    public static void claimWriter(ArrayList<Claim> claims) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM Claim";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO Claim (id, claimDate, insuredPerson, cardNumber, examDate, documents, claimAmount, status, bankingInfo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (Claim claim : claims) {
+                insertStatement.setString(1, claim.getId());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = dateFormat.format(claim.getClaimDate());
+                insertStatement.setString(2, dateString);
+                insertStatement.setString(3, claim.getInsuredPerson());
+                insertStatement.setString(4, claim.getCardNumber());
+                dateString = dateFormat.format(claim.getExamDate());
+                insertStatement.setString(5, dateString);
+                String documentsString = String.join(",", claim.getDocuments());
+                insertStatement.setString(6, documentsString);
+                insertStatement.setDouble(7, claim.getClaimAmount());
+                insertStatement.setString(8, claim.getStatus());
+                insertStatement.setString(9, claim.getBankingInfo());
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Claim> claimReader() {
+        ArrayList<Claim> claims = new ArrayList<>();
+
+        String selectSql = "SELECT id, claimDate, insuredPerson, cardNumber, examDate, documents, claimAmount, status, bankingInfo FROM Claim";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String claimDateString = resultSet.getString("claimDate");
+                String insuredPerson = resultSet.getString("insuredPerson");
+                String cardNumber = resultSet.getString("cardNumber");
+                String examDateString = resultSet.getString("examDate");
+                String documentsString = resultSet.getString("documents");
+                double claimAmount = resultSet.getDouble("claimAmount");
+                String status = resultSet.getString("status");
+                String bankingInfo = resultSet.getString("bankingInfo");
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                java.util.Date claimDate = dateFormat.parse(claimDateString);
+                java.util.Date examDate = dateFormat.parse(examDateString);
+
+                ArrayList<String> documents = new ArrayList<>(Arrays.asList(documentsString.split(",")));
+
+                Claim claim = new Claim(id, claimDate, insuredPerson, cardNumber, examDate, documents, claimAmount, status, bankingInfo);
+
+                claims.add(claim);
+            }
+        } catch (SQLException | java.text.ParseException e) {
+            e.printStackTrace();
+        }
+
+        return claims;
+    }
+
+    public static void insuranceCardWriter(ArrayList<InsuranceCard> insuranceCards) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM InsuranceCard";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO InsuranceCard (cardNumber, cardHolder, policyOwner, expirationDate) VALUES (?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (InsuranceCard insuranceCard : insuranceCards) {
+                insertStatement.setString(1, insuranceCard.getCardNumber());
+                insertStatement.setString(2, insuranceCard.getCardHolder());
+                insertStatement.setString(3, insuranceCard.getPolicyOwner());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = dateFormat.format(insuranceCard.getExpirationDate());
+                insertStatement.setString(4, dateString);
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<InsuranceCard> insuranceCardReader() {
+        ArrayList<InsuranceCard> insuranceCards = new ArrayList<>();
+
+        String selectSql = "SELECT cardNumber, cardHolder, policyOwner, expirationDate FROM InsuranceCard";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String cardNumber = resultSet.getString("cardNumber");
+                String cardHolder = resultSet.getString("cardHolder");
+                String policyOwner = resultSet.getString("policyOwner");
+                String expirationDateString = resultSet.getString("expirationDate");
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                java.util.Date expirationDate = dateFormat.parse(expirationDateString);
+
+                InsuranceCard insuranceCard = new InsuranceCard(cardNumber, cardHolder, policyOwner, expirationDate);
+
+                insuranceCards.add(insuranceCard);
+            }
+        } catch (SQLException | java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        return insuranceCards;
+    }
 }

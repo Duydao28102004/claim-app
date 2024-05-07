@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class Customer {
     private String id;
     private String fullName;
-    private InsuranceCard insuranceCard;
-    private ArrayList<Claim> claims;
+    private String insuranceCard;
+    private ArrayList<String> claims;
     public Customer() {
         id = "default";
         fullName = "default";
@@ -22,7 +22,7 @@ public class Customer {
         claims = null;
     }
 
-    public Customer(String id, String fullName, InsuranceCard insuranceCard, ArrayList<Claim> claims) {
+    public Customer(String id, String fullName, String insuranceCard, ArrayList<String> claims) {
         this.id = id;
         this.fullName = fullName;
         this.insuranceCard = insuranceCard;
@@ -45,19 +45,19 @@ public class Customer {
         this.fullName = fullName;
     }
 
-    public InsuranceCard getInsuranceCard() {
+    public String getInsuranceCard() {
         return insuranceCard;
     }
 
-    public void setInsuranceCard(InsuranceCard insuranceCard) {
+    public void setInsuranceCard(String insuranceCard) {
         this.insuranceCard = insuranceCard;
     }
 
-    public ArrayList<Claim> getClaims() {
+    public ArrayList<String> getClaims() {
         return claims;
     }
 
-    public void setClaims(ArrayList<Claim> claims) {
+    public void setClaims(ArrayList<String> claims) {
         this.claims = claims;
     }
 }
