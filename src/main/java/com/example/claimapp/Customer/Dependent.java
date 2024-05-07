@@ -13,7 +13,7 @@ public class Dependent extends Customer {
         policyHolder = "null";
     }
 
-    public Dependent(String id, String fullName, InsuranceCard insuranceCard, ArrayList<Claim> claims, String policyHolder) {
+    public Dependent(String id, String fullName, String insuranceCard, ArrayList<String> claims, String policyHolder) {
         super(id, fullName, insuranceCard, claims);
         this.policyHolder = policyHolder;
     }
@@ -27,7 +27,7 @@ public class Dependent extends Customer {
     }
 
     // Method to retrieve own claims
-    public ArrayList<Claim> retrieveClaims() {
+    public ArrayList<String> retrieveClaims() {
         return getClaims();
     }
 

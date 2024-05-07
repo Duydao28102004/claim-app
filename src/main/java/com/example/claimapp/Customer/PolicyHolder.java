@@ -6,62 +6,65 @@ import com.example.claimapp.InsuranceCard;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.google.gson.Gson;
+
 public class PolicyHolder extends Customer {
     private ArrayList<String> dependents;
-    private ArrayList<Claim> claims; // Ensure that claims are part of PolicyHolder
+    private ArrayList<Claim> claims;  // This will hold the actual Claim objects.
 
-    public PolicyHolder() {
-        super();
-        dependents = new ArrayList<>();
-        claims = new ArrayList<>();
-    }
-
-    public PolicyHolder(String id, String fullName, InsuranceCard insuranceCard, ArrayList<Claim> claims, ArrayList<String> dependents) {
-        super(id, fullName, insuranceCard, claims);
+    public PolicyHolder(String id, String fullName, String insuranceCard, ArrayList<String> serializedClaims, ArrayList<String> dependents) {
+        super(id, fullName, insuranceCard, serializedClaims);  // Passing serialized claims to the superclass.
         this.dependents = dependents;
-        this.claims = new ArrayList<>(claims);
+        this.claims = deserializeClaims(serializedClaims);
     }
 
-    public ArrayList<String> getDependents() {
-        return dependents;
+    // Serialize Claim objects to a JSON string
+    private String serializeClaim(Claim claim) {
+        Gson gson = new Gson();
+        return gson.toJson(claim);
     }
 
-    public void setDependents(ArrayList<String> dependents) {
-        this.dependents = dependents;
+    // Deserialize JSON strings back to Claim objects
+    private ArrayList<Claim> deserializeClaims(ArrayList<String> serializedClaims) {
+        Gson gson = new Gson();
+        ArrayList<Claim> claimsList = new ArrayList<>();
+        for (String serializedClaim : serializedClaims) {
+            claimsList.add(gson.fromJson(serializedClaim, Claim.class));
+        }
+        return claimsList;
     }
 
-    // Method to file a new claim
-    public void addClaim(String id, Date claimDate, String insuredPerson, String cardNumber, Date examDate, ArrayList<String> documents, double claimAmount, String status, String bankingInfo) {
+    // Serialize a list of claims
+    private ArrayList<String> serializeClaims(ArrayList<Claim> claims) {
+        ArrayList<String> serializedClaims = new ArrayList<>();
         for (Claim claim : claims) {
-            if (claim.getId().equals(id)) {
-                return; // Claim already exists, no duplication
+            serializedClaims.add(serializeClaim(claim));
+        }
+        return serializedClaims;
+    }
+
+    // Method to add a claim
+    public void addClaim(Claim newClaim) {
+        claims.add(newClaim);
+        setClaims(serializeClaims(claims));  // Update the serialized claims in the superclass.
+    }
+
+    // Method to update a claim
+    public void updateClaim(String claimId, Claim updatedClaim) {
+        for (int i = 0; i < claims.size(); i++) {
+            if (claims.get(i).getId().equals(claimId)) {
+                claims.set(i, updatedClaim);
+                setClaims(serializeClaims(claims));
+                break;
             }
         }
-        claims.add(new Claim(id, claimDate, insuredPerson, cardNumber, examDate, documents, claimAmount, status, bankingInfo));
-    }
-
-    // Method to update an existing claim
-    public void updateClaim(String id, Date claimDate, String insuredPerson, String cardNumber, Date examDate, ArrayList<String> documents, double claimAmount, String status, String bankingInfo) {
-        for (Claim claim : claims) {
-            if (claim.getId().equals(id)) {
-                claim.setClaimDate(claimDate);
-                claim.setInsuredPerson(insuredPerson);
-                claim.setCardNumber(cardNumber);
-                claim.setExamDate(examDate);
-                claim.setDocuments(documents);
-                claim.setClaimAmount(claimAmount);
-                claim.setStatus(status);
-                claim.setBankingInfo(bankingInfo);
-                return; // Update the claim and return
-            }
-        }
-        // If no claim found, optionally add it or handle error
     }
 
     // Method to retrieve claims
     public ArrayList<Claim> retrieveClaims() {
-        return new ArrayList<>(claims); // Return a copy of the claims list
+        return claims;
     }
+
 
     // Method to update restricted personal information (phone, address, email, password)
     public void updatePersonalInfo(String phone, String address, String email, String password) {
