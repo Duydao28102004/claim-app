@@ -285,4 +285,58 @@ public class FileManager {
         }
         return insuranceCards;
     }
+
+    public static ArrayList<Authentication> authenticationReader() {
+        ArrayList<Authentication> authentications = new ArrayList<>();
+
+        String selectSql = "SELECT id, password, userType FROM Authentication";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String password = resultSet.getString("password");
+                String userType = resultSet.getString("userType");
+
+                Authentication authentication = new Authentication(id, password, userType);
+
+                authentications.add(authentication);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+    }
+        return authentications;
+    }
+
+    public static void authenticationWriter(ArrayList<Authentication> authentications) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM Authentication";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO Authentication (id, password, userType) VALUES (?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (Authentication authentication : authentications) {
+                insertStatement.setString(1, authentication.getId());
+                insertStatement.setString(2, authentication.getPassword());
+                insertStatement.setString(3, authentication.getUserType());
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

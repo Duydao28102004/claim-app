@@ -33,12 +33,11 @@ public class PolicyHolder extends Customer {
 
     @Override
     public String toString() {
-        return "PolicyHolder{" +
-                "id='" + getId() + '\'' +
-                ", fullName='" + getFullName() + '\'' +
-                ", insuranceCard='" + getInsuranceCard() + '\'' +
-                ", claims='" + getClaims() + '\'' +
-                ", dependents='" + dependents + '\'' +
-                '}';
+        return
+                "id: " + getId() + ' ' +
+                ", full name: " + getFullName() + ' ' +
+                ", insurance card: " + getInsuranceCard() + "\n " +
+                "    claims: " + getClaims() + "\n " +
+                "    dependents: " + dependents + ' ';
     }
 }
