@@ -59,4 +59,3 @@ public class InsuranceCard {
         this.expirationDate = expirationDate;
     }
 }
-
