@@ -6,21 +6,30 @@ import java.util.ArrayList;
 public class PolicyOwner {
     private String id;
     private String fullName;
-    private ArrayList<Customer> beneficiaries;
 
     public PolicyOwner() {
-        beneficiaries = new ArrayList<>();
+        id = "default";
+        fullName = "default";
     }
 
-    public PolicyOwner(ArrayList<Customer> beneficiaries) {
-        this.beneficiaries = beneficiaries;
+    public PolicyOwner(String id, String fullName) {
+        this.id = id;
+        this.fullName = fullName;
     }
 
-    public ArrayList<Customer> getBeneficiaries() {
-        return beneficiaries;
+    public String getId() {
+        return id;
     }
 
-    public void setBeneficiaries(ArrayList<Customer> beneficiaries) {
-        this.beneficiaries = beneficiaries;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

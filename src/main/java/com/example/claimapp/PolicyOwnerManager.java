@@ -68,6 +68,19 @@ public class PolicyOwnerManager {
 
     public void viewPolicyHolders() {
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
+        for (PolicyHolder policyHolder : policyHolders) {
+            for (InsuranceCard insuranceCard : insuranceCards) {
+                if (policyHolder.getInsuranceCard().equals(insuranceCard.getCardNumber())) {
+                    if (!insuranceCard.getPolicyOwner().equals(UserSession.getLoggedInUserId())) {
+                        policyHolders.remove(policyHolder);
+                    }
+                } else {
+                    System.out.println("running");
+                    policyHolders.remove(policyHolder);
+                }
+            }
+        }
 
         // Create a VBox to hold the labels
         VBox vbox = new VBox();

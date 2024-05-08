@@ -58,5 +58,15 @@ public class InsuranceCard {
     public void setExpirationDate(Date expirationDate) {
         this.expirationDate = expirationDate;
     }
+
+    @Override
+    public String toString() {
+        return "InsuranceCard{" +
+                "cardNumber='" + cardNumber + '\'' +
+                ", cardHolder='" + cardHolder + '\'' +
+                ", policyOwner='" + policyOwner + '\'' +
+                ", expirationDate=" + expirationDate +
+                '}';
+    }
 }
 
