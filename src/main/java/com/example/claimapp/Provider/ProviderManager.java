@@ -6,6 +6,9 @@ import java.util.*;
 
 import com.example.claimapp.Customer.Customer;
 import com.example.claimapp.InsuranceCard;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 
 
 public class ProviderManager {
@@ -87,4 +90,31 @@ public class ProviderManager {
     public static ArrayList<InsuranceSurveyor> getInsuranceSurveyors() {
         return insuranceSurveyors;
     }
+
+    void displayNewClaims(List<Claim> newClaims, GridPane gridPane) {
+        // Step 1: Clear existing claims if any
+        InsuranceManagerController insuranceManagerController = new InsuranceManagerController();
+        insuranceManagerController.clearTextArea(gridPane);
+
+        // Step 2: Display each claim with a process button
+        for (int i = 0; i < newClaims.size(); i++) {
+            Claim claim = newClaims.get(i);
+            Label claimLabel = new Label("Claim ID: " + claim.getId());
+            Button processButton = new Button("Process");
+            processButton.setOnAction(event -> processClaim(claim));
+
+            // Add claim and process button to the grid pane
+            gridPane.add(claimLabel, 0, i + 1);
+            gridPane.add(processButton, 1, i + 1);
+        }
+    }
+
+    void processClaim(Claim claim) {
+        // Implement logic to process the claim (e.g., update status)
+        // For example:
+        claim.setStatus("Processed");
+        // Update the UI or database accordingly
+    }
+
+
 }
