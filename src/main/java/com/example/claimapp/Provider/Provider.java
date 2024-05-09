@@ -7,7 +7,6 @@ public class Provider {
     private String phone;
     private String address;
     private String email;
-    private String password;
 
     public Provider() {
         this.id = "default";
@@ -15,16 +14,14 @@ public class Provider {
         this.phone = null;
         this.address = null;
         this.email = null;
-        this.password = null;
     }
 
-    public Provider(String id, String fullName, String phone, String address, String email, String password) {
+    public Provider(String id, String fullName, String phone, String address, String email) {
         this.id = id;
         this.fullName = fullName;
         this.phone = phone;
         this.address = address;
         this.email = email;
-        this.password = password;
     }
 
     public String getId() {
@@ -59,12 +56,5 @@ public class Provider {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
 }

@@ -13,37 +13,32 @@ import javafx.scene.layout.GridPane;
 
 public class ProviderManager {
 
-    private static final String SUPABASE_URL = "https://byvqoczsxkvoqxbftqqb.supabase.co";
-    private static final String SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5dnFvY3pzeGt2b3F4YmZ0cX";
-
-    // Rest of the class implementation...
-
     private ArrayList<Claim> claims = new ArrayList<>();
     private ArrayList<Customer> customers = new ArrayList<>();
     private static ArrayList<InsuranceManager> insuranceManagers = new ArrayList<>();
     private static ArrayList<InsuranceSurveyor> insuranceSurveyors = new ArrayList<>();
 
-    public ProviderManager() {
-        initializeSampleData();
-    }
-
-    private void initializeSampleData() {
-        // Sample claims
-        claims.add(new Claim("Claim-1", new Date("11/11/11111"), "John Doe", "1234-5678-9012-3456", new Date(), new ArrayList<>(), 1000.00, "New", "BankInfo: ABCBank_123456789"));
-        claims.add(new Claim("Claim-2", new Date("22/22/2222"), "Jane Smith", "2345-6789-0123-4567", new Date(), new ArrayList<>(), 1500.00, "New", "BankInfo: XYZ_987654321"));
-
-        // Sample customers
-        customers.add(new Customer("c-1111111", "John Doe", new InsuranceCard(), null));
-        customers.add(new Customer("c-2222222", "Jane Smith", new InsuranceCard(), null));
-
-        // Sample insurance manager
-        InsuranceManager manager = new InsuranceManager("im-1", "Manager One", "1234567890", "123 Main St", "manager@example.com", "password", null);
-        insuranceManagers.add(manager);
-
-        // Sample insurance surveyor
-        InsuranceSurveyor surveyor = new InsuranceSurveyor("is-1", "Surveyor One", "9876543210", "456 Elm St", "surveyor@example.com", "password", null);
-        insuranceSurveyors.add(surveyor);
-    }
+//    public ProviderManager() {
+//        initializeSampleData();
+//    }
+//
+//    private void initializeSampleData() {
+//        // Sample claims
+//        claims.add(new Claim("Claim-1", new Date("11/11/11111"), "John Doe", "1234-5678-9012-3456", new Date(), new ArrayList<>(), 1000.00, "New", "BankInfo: ABCBank_123456789"));
+//        claims.add(new Claim("Claim-2", new Date("22/22/2222"), "Jane Smith", "2345-6789-0123-4567", new Date(), new ArrayList<>(), 1500.00, "New", "BankInfo: XYZ_987654321"));
+//
+//        // Sample customers
+//        customers.add(new Customer("c-1111111", "John Doe", new InsuranceCard(), null));
+//        customers.add(new Customer("c-2222222", "Jane Smith", new InsuranceCard(), null));
+//
+//        // Sample insurance manager
+//        InsuranceManager manager = new InsuranceManager("im-1", "Manager One", "1234567890", "123 Main St", "manager@example.com", "password", null);
+//        insuranceManagers.add(manager);
+//
+//        // Sample insurance surveyor
+//        InsuranceSurveyor surveyor = new InsuranceSurveyor("is-1", "Surveyor One", "9876543210", "456 Elm St", "surveyor@example.com", "password", null);
+//        insuranceSurveyors.add(surveyor);
+//    }
 
     public ArrayList<Claim> getAllClaims() {
         return claims;

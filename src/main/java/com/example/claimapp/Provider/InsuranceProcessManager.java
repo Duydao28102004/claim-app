@@ -45,7 +45,7 @@ public class InsuranceProcessManager {
 
             if (surveyor != null) {
                 // Add the surveyor to the InsuranceManager
-                manager.addSurveyor(surveyor);
+                manager.addSurveyor(String.valueOf(surveyor));
 
                 // Optionally, you can display a message indicating success
                 System.out.println("Surveyor added to manager: " + manager.getFullName());

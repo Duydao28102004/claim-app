@@ -2,6 +2,8 @@ package com.example.claimapp;
 
 import com.example.claimapp.Customer.Dependent;
 import com.example.claimapp.Customer.PolicyHolder;
+import com.example.claimapp.Provider.InsuranceManager;
+import com.example.claimapp.Provider.InsuranceSurveyor;
 
 
 import java.sql.*;
@@ -284,5 +286,133 @@ public class FileManager {
             e.printStackTrace();
         }
         return insuranceCards;
+    }
+
+    public static void insuranceManagerWriter(ArrayList<InsuranceManager> insuranceManagers) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM InsuranceManager";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO InsuranceManager (id, fullName, phone, address, email, insuranceSurveyors) VALUES (?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (InsuranceManager insuranceManager : insuranceManagers) {
+                ArrayList<String> insuranceSurveyors = insuranceManager.getInsuranceSurveyors();
+                String surveyorsString = String.join(",", insuranceSurveyors);
+
+                insertStatement.setString(1, insuranceManager.getId());
+                insertStatement.setString(2, insuranceManager.getFullName());
+                insertStatement.setString(3, insuranceManager.getPhone());
+                insertStatement.setString(4, insuranceManager.getAddress());
+                insertStatement.setString(5, insuranceManager.getEmail());
+                insertStatement.setString(6, surveyorsString);
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<InsuranceManager> insuranceManagerReader() {
+        ArrayList<InsuranceManager> insuranceManagers = new ArrayList<>();
+
+        String selectSql = "SELECT id, fullName, phone, address, email, insuranceSurveyors FROM InsuranceManager";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String fullName = resultSet.getString("fullName");
+                String phone = resultSet.getString("policyOwner");
+                String address = resultSet.getString("address");
+                String email = resultSet.getString("email");
+                String surveyorsString = resultSet.getString("insuranceSurveyors");
+
+                ArrayList<String> insuranceSurveyors = new ArrayList<>(Arrays.asList(surveyorsString.split(",")));
+
+                InsuranceManager insuranceManager = new InsuranceManager(id, fullName, phone, address, email, insuranceSurveyors);
+                insuranceManagers.add(insuranceManager);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return insuranceManagers;
+    }
+
+    public static void insuranceSurveyorWriter(ArrayList<InsuranceSurveyor> insuranceSurveyors) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM InsuranceSurveyor";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO Dependent (id, fullName, phone, address, email, insuranceManager) VALUES (?, ?, ?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (InsuranceSurveyor insuranceSurveyor : insuranceSurveyors) {
+
+                insertStatement.setString(1, insuranceSurveyor.getId());
+                insertStatement.setString(2, insuranceSurveyor.getFullName());
+                insertStatement.setString(3, insuranceSurveyor.getPhone());
+                insertStatement.setString(4, insuranceSurveyor.getAddress());
+                insertStatement.setString(5, insuranceSurveyor.getEmail());
+                insertStatement.setString(6, insuranceSurveyor.getManager());
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<InsuranceSurveyor> insuranceSurveyorReader() {
+        ArrayList<InsuranceSurveyor> insuranceSurveyors = new ArrayList<>();
+
+        String selectSql = "SELECT id, fullName, phone, address, email, insuranceManager FROM InsuranceSurveyor";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String fullName = resultSet.getString("fullName");
+                String phone = resultSet.getString("policyOwner");
+                String address = resultSet.getString("address");
+                String email = resultSet.getString("email");
+                String insuranceManager = resultSet.getString("insuranceManager");
+
+
+                InsuranceSurveyor insuranceSurveyor = new InsuranceSurveyor(id, fullName, phone, address, email, insuranceManager);
+
+                insuranceSurveyors.add(insuranceSurveyor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return insuranceSurveyors;
     }
 }

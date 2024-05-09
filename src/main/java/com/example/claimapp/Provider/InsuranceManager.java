@@ -4,25 +4,35 @@ import java.util.ArrayList;
 
 public class InsuranceManager extends Provider{
 
-    private ArrayList<InsuranceSurveyor> insuranceSurveyors;
+    private ArrayList<String> insuranceSurveyors;
 
-    public InsuranceManager() {
+    public InsuranceManager(String id, String fullName, String phone, String address, ArrayList<String> insuranceSurveyors) {
         super();
-        insuranceSurveyors = null;
+        this.insuranceSurveyors = null;
     }
 
-    public InsuranceManager(String id, String fullName, String phone, String address, String email, String password, ArrayList<InsuranceSurveyor> insuranceSurveyors) {
-        super(id, fullName, phone, address, email, password);
+    public InsuranceManager(String id, String fullName, String phone, String address, String email, ArrayList<String> insuranceSurveyors) {
+        super(id, fullName, phone, address, email);
         this.insuranceSurveyors = insuranceSurveyors;
     }
 
-    public ArrayList<InsuranceSurveyor> getInsuranceSurveyors() {
+    public ArrayList<String> getInsuranceSurveyors() {
         return insuranceSurveyors;
     }
 
-    public void addSurveyor(InsuranceSurveyor surveyor) {
+    public void addSurveyor(String surveyor) {
         insuranceSurveyors.add(surveyor);
     }
 
+    @Override
+    public String toString() {
+        return "InsuranceManager{" + getId() + '\'' +
+                ", fullName='" + getFullName() + '\'' +
+                ", phone='" + getPhone() + '\'' +
+                ", address='" + getAddress() + '\'' +
+                ", email='" + getEmail() + '\'' +
+                "insuranceSurveyors=" + insuranceSurveyors +
+                '}';
+    }
 
 }
