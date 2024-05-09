@@ -113,6 +113,12 @@ public class Authentication {
                             PolicyOwnerManager policyOwnerManager = new PolicyOwnerManager();
                             UserSession.setLoggedInUserId(id);
                             UserSession.getStage().setScene(new Scene(policyOwnerManager.policyOwnerMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("admin")) {
+                            AdminManager adminManager = new AdminManager();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(adminManager.adminMenu(), 500, 300));
+                        } else {
+                            warningLabel.setText("Invalid user type. Please try again.");
                         }
                     } else {
                         warningLabel.setText("Invalid password. Please try again.");

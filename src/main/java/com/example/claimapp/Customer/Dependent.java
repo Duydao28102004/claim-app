@@ -33,11 +33,11 @@ public class Dependent extends Customer {
     @Override
     public String toString() {
         return "Dependent{" +
-                "id='" + getId() + '\'' +
-                ", fullName='" + getFullName() + '\'' +
-                ", insuranceCard='" + getInsuranceCard() + '\'' +
-                ", claims='" + getClaims() + '\'' +
-                ", policyHolder='" + policyHolder + '\'' +
+                "id= " + getId() + ' ' +
+                "  fullName= " + getFullName() + ' ' +
+                "  insuranceCard= " + getInsuranceCard() + ' ' +
+                "  claims= " + getClaims() + ' ' +
+                "  policyHolder= " + policyHolder + ' ' +
                 '}';
     }
 }
