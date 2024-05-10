@@ -110,7 +110,7 @@ public class AdminManager {
         submitButton.setOnAction(e -> {
             String enteredId = idField.getText().trim();
             // Check if the entered ID format is correct
-            if (!isValidIdFormat(enteredId)) {
+            if (!enteredId.matches("^po-[a-zA-Z0-9]{6}$")) {
                 // If the format is incorrect, show a warning
                 System.out.println("Incorrect ID Format");
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -118,7 +118,7 @@ public class AdminManager {
                 alert.setHeaderText(null);
                 alert.setContentText("Please enter the ID in the format po-xxxxxx.");
                 alert.showAndWait();
-            } else if (isIdExists(policyOwners, enteredId)) {
+            } else if (isIdPoExists(policyOwners, enteredId)) {
                 // If the ID exists, show a warning
                 System.out.println("ID Already Exists");
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -137,11 +137,7 @@ public class AdminManager {
         });
         UserSession.getStage().setScene(new Scene(gridPane, 400, 200));
     }
-    private boolean isValidIdFormat(String id) {
-        // Check if the ID matches the required format
-        return id.matches("^po-[a-zA-Z0-9]{6}$");
-    }
-    private boolean isIdExists(ArrayList<PolicyOwner> policyOwners, String id) {
+    private boolean isIdPoExists(ArrayList<PolicyOwner> policyOwners, String id) {
         for (PolicyOwner policyOwner : policyOwners) {
             if (policyOwner.getId().equals(id)) {
                 return true;
@@ -155,7 +151,7 @@ public class AdminManager {
         ArrayList<Authentication> authentications = FileManager.authenticationReader();
 
         Label idLabel = new Label("ID (ph-xxxxxx): ");
-        Label passwordLabel = new Label("Password: ");
+        Label passwordLabel = new Label("Passwowrd: ");
         Label fullNameLabel = new Label("Full Name: ");
 
         TextField idField = new TextField();
@@ -167,6 +163,61 @@ public class AdminManager {
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(5);
         gridPane.setHgap(5);
+
+        gridPane.add(idLabel, 0, 1);
+        gridPane.add(idField, 1, 1);
+        gridPane.add(passwordLabel, 0, 2);
+        gridPane.add(passwordField, 1, 2);
+        gridPane.add(fullNameLabel, 0, 3);
+        gridPane.add(fullNameField, 1, 3);
+
+        GridPane buttons = new GridPane();
+        Button submitButton = new Button("Submit");
+        buttons.add(submitButton, 1, 0);
+
+        Button exitButton = new Button("Exit");
+        buttons.add(exitButton, 0, 0);
+
+        gridPane.add(buttons, 1, 4);
+
+        exitButton.setOnAction(e -> UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300)));
+
+        submitButton.setOnAction(e ->{
+            String enteredId = idField.getText().trim();
+            // Check if the entered ID format is correct
+            if (!enteredId.matches("^ph-[a-zA-Z0-9]{6}$")) {
+                // If the format is incorrect, show a warning
+                System.out.println("Incorrect ID Format");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Incorrect ID Format");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter the ID in the format ph-xxxxxx.");
+                alert.showAndWait();
+            } else if (isIdPhExists(policyHolders, enteredId)) {
+                // If the ID exists, show a warning
+                System.out.println("ID Already Exists");
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("ID Already Exists");
+                alert.setHeaderText(null);
+                alert.setContentText("The entered ID already exists. Please enter a different ID.");
+                alert.showAndWait();
+            } else {
+                PolicyHolder newPolicyHolder = new PolicyHolder(enteredId, fullNameField.getText(), "", new ArrayList<>(), new ArrayList<>());
+                policyHolders.add(newPolicyHolder);
+                authentications.add(new Authentication(enteredId, passwordField.getText(), "policyHolder"));
+                FileManager.policyHolderWriter(policyHolders);
+                FileManager.authenticationWriter(authentications);
+                UserSession.getStage().setScene(new Scene(adminMenu(), 400, 200));
+            }
+        });
+    }
+    private boolean isIdPhExists(ArrayList<PolicyHolder> policyHolders, String id) {
+        for (PolicyHolder policyHolder : policyHolders) {
+            if (policyHolder.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
