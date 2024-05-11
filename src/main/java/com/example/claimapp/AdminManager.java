@@ -64,6 +64,7 @@ public class AdminManager {
         gridPane.add(logout, 0, 7);
 
         createPolicyOwnerButton.setOnAction(e -> createPolicyOwner());
+        createPolicyHolderButton.setOnAction(e -> createPolicyHolder());
 
         return gridPane;
     }
@@ -163,6 +164,7 @@ public class AdminManager {
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(5);
         gridPane.setHgap(5);
+        gridPane.setAlignment(Pos.CENTER);
 
         gridPane.add(idLabel, 0, 1);
         gridPane.add(idField, 1, 1);
@@ -210,6 +212,7 @@ public class AdminManager {
                 UserSession.getStage().setScene(new Scene(adminMenu(), 400, 200));
             }
         });
+        UserSession.getStage().setScene(new Scene(gridPane, 400, 200));
     }
     private boolean isIdPhExists(ArrayList<PolicyHolder> policyHolders, String id) {
         for (PolicyHolder policyHolder : policyHolders) {
