@@ -194,19 +194,27 @@ public class InsuranceManagerController {
         getClaimsButton.setOnAction(e -> {
             // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
             ProviderManager dataRetriever = new ProviderManager();
-            List<Claim> Claims = dataRetriever.getAllClaims(); // Assuming getAllClaims() returns a List<Claim>
+            ArrayList<Claim> Claims = dataRetriever.getAllClaims(); // Assuming getAllClaims() returns a List<Claim>
 
-            // Step 2: Format the claims data into a suitable format for display on the UI
-            StringBuilder formattedClaims = new StringBuilder();
-            for (Claim claim : Claims) {
-                formattedClaims.append(claim.toString()).append("\n"); // Assuming toString() provides a suitable representation of the claim
+            // Check if the claims list is empty
+            if (Claims.isEmpty()) {
+                // If there are no claims, display a message
+                TextArea noClaimsTextArea = new TextArea();
+                noClaimsTextArea.setText("There are no claims.");
+                gridPane.add(noClaimsTextArea, 0, 7, 2, 1);
+            } else {
+                // Step 2: Format the claims data into a suitable format for display on the UI
+                StringBuilder formattedClaims = new StringBuilder();
+                for (Claim claim : Claims) {
+                    formattedClaims.append(claim.toString()).append("\n"); // Assuming toString() provides a suitable representation of the claim
+                }
+
+                // Step 3: Update the UI to display the formatted claims data
+                TextArea claimsTextArea = new TextArea();
+                claimsTextArea.setText(formattedClaims.toString());
+                // Assuming you have a GridPane named gridPane where you want to display the claims
+                gridPane.add(claimsTextArea, 0, 7, 2, 1);
             }
-
-            // Step 3: Update the UI to display the formatted claims data
-            TextArea claimsTextArea = new TextArea();
-            claimsTextArea.setText(formattedClaims.toString());
-            // Assuming you have a GridPane named gridPane where you want to display the claims
-            gridPane.add(claimsTextArea, 0, 7, 2, 1);
         });
 
 
@@ -217,10 +225,9 @@ public class InsuranceManagerController {
                 case "Latest to Earliest":
                     // Step 1: Retrieve all the claims from the database
                     ProviderManager dataRetriever = new ProviderManager();
-                    List<Claim> sortedClaims = dataRetriever.getAllClaims();
 
                     // Step 2: Sort the claims from the latest to earliest creation date
-                    List<Claim> sortedClaimsLatestToEarliest = dataRetriever.claimLatestToEarliest(sortedClaims);
+                    ArrayList<Claim> sortedClaimsLatestToEarliest = dataRetriever.claimLatestToEarliest();
 
                     // Step 3: Format the sorted claims data into a suitable format for display on the UI
                     StringBuilder formattedSortedClaims = new StringBuilder();
@@ -239,10 +246,9 @@ public class InsuranceManagerController {
                     // Similar steps as above, but using claimEarliestToLatest function
                     // Step 1: Retrieve all the claims from the database
                     dataRetriever = new ProviderManager();
-                    List<Claim> allClaimsEarliestToLatest = dataRetriever.getAllClaims();
 
                     // Step 2: Sort the claims from the earliest to latest creation date
-                    List<Claim> sortedClaimsEarliestToLatest = dataRetriever.claimEarliestToLatest(allClaimsEarliestToLatest);
+                    ArrayList<Claim> sortedClaimsEarliestToLatest = dataRetriever.claimEarliestToLatest();
 
                     // Step 3: Format the sorted claims data into a suitable format for display on the UI
                     StringBuilder formattedSortedClaimsEarliestToLatest = new StringBuilder();
@@ -268,7 +274,7 @@ public class InsuranceManagerController {
         getCustomersButton.setOnAction(e -> {
             // Step 1: Retrieve all the customers from the database (replace this with your actual database retrieval logic)
             ProviderManager dataRetriever = new ProviderManager();
-            List<Customer> allCustomers = dataRetriever.getAllCustomers(); // Assuming getAllCustomers() returns a List<Customer>
+            ArrayList<Customer> allCustomers = dataRetriever.getAllCustomers(); // Assuming getAllCustomers() returns a List<Customer>
 
             // Step 2: Format the customers data into a suitable format for display on the UI
             StringBuilder formattedCustomers = new StringBuilder();

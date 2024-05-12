@@ -5,6 +5,9 @@ import com.example.claimapp.Claim;
 import java.util.*;
 
 import com.example.claimapp.Customer.Customer;
+import com.example.claimapp.Customer.Dependent;
+import com.example.claimapp.Customer.PolicyHolder;
+import com.example.claimapp.FileManager;
 import com.example.claimapp.InsuranceCard;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -41,39 +44,62 @@ public class ProviderManager {
 //    }
 
     public ArrayList<Claim> getAllClaims() {
-        return claims;
+        // Retrieve all claims from the database using FileManager
+        return FileManager.claimReader();
     }
 
+
     public ArrayList<Customer> getAllCustomers() {
+        // Retrieve all dependents and add them to the list
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        customers.addAll(dependents);
+
+        // Retrieve all policy holders and add them to the list
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        customers.addAll(policyHolders);
+
         return customers;
     }
 
+
     public Claim getSpecificClaim(String claimId) {
+        // Retrieve all claims using claimReader
+        ArrayList<Claim> claims = FileManager.claimReader();
+
+        // Iterate through the claims to find the specific claim
         for (Claim claim : claims) {
             if (claim.getId().equals(claimId)) {
-                return claim;
+                return claim; // Return the claim if found
             }
         }
         return null; // Return null if claim with the specified ID is not found
     }
 
+
     public Customer getSpecificCustomer(String customerName) {
+        // Retrieve all customers using getAllCustomers function
+        ArrayList<Customer> customers = getAllCustomers();
+
+        // Iterate through the customers to find the specific customer
         for (Customer customer : customers) {
             if (customer.getFullName().equals(customerName)) {
-                return customer;
+                return customer; // Return the customer if found
             }
         }
         return null; // Return null if customer with the specified name is not found
     }
 
+
     // Function to arrange claims from the latest to earliest creation date
-    public List<Claim> claimLatestToEarliest(List<Claim> claims) {
+    public ArrayList<Claim> claimLatestToEarliest() {
+        ArrayList<Claim> claims = FileManager.claimReader();
         claims.sort(Comparator.comparing(Claim::getClaimDate).reversed());
         return claims;
     }
 
     // Function to arrange claims from the earliest to latest creation date
-    public List<Claim> claimEarliestToLatest(List<Claim> claims) {
+    public ArrayList<Claim> claimEarliestToLatest() {
+        ArrayList<Claim> claims = FileManager.claimReader();
         claims.sort(Comparator.comparing(Claim::getClaimDate));
         return claims;
     }
@@ -86,7 +112,7 @@ public class ProviderManager {
         return insuranceSurveyors;
     }
 
-    void displayNewClaims(List<Claim> newClaims, GridPane gridPane) {
+    void displayNewClaims(ArrayList<Claim> newClaims, GridPane gridPane) {
         // Step 1: Clear existing claims if any
         InsuranceManagerController insuranceManagerController = new InsuranceManagerController();
         insuranceManagerController.clearTextArea(gridPane);

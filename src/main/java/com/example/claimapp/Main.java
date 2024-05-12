@@ -2,6 +2,7 @@ package com.example.claimapp;
 
 import com.example.claimapp.Customer.Dependent;
 import com.example.claimapp.Customer.PolicyHolder;
+import com.example.claimapp.Provider.InsuranceManagerController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -32,10 +33,12 @@ public class Main extends Application {
             System.out.println(claim);
         }
         Authentication authentication = new Authentication();
+        InsuranceManagerController insuranceManagerController = new InsuranceManagerController();
         // Create scene and set it on the stage
         Scene scene = new Scene(authentication.loginPane(stage), 500, 300);
+        Scene scene2 = new Scene(insuranceManagerController.insuranceManagerPane(), 500, 300);
         stage.setTitle("Claim Management System - Authentication");
-        stage.setScene(scene);
+        stage.setScene(scene2);
         stage.show();
     }
 
