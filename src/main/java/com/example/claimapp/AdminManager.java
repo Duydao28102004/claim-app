@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Formattable;
+import java.util.Optional;
 
 public class AdminManager {
     public GridPane adminMenu() {
@@ -25,9 +26,9 @@ public class AdminManager {
         Button policyOwnerButton = new Button("Policy Owner");
         policyOwnerButton.setPrefWidth(250);
         policyOwnerButton.setAlignment(Pos.CENTER);
-        Button createPolicyHolderButton = new Button("Create Policy Holder");
-        createPolicyHolderButton.setPrefWidth(250);
-        createPolicyHolderButton.setAlignment(Pos.CENTER);
+        Button PolicyHolderButton = new Button("Policy Holder");
+        PolicyHolderButton.setPrefWidth(250);
+        PolicyHolderButton.setAlignment(Pos.CENTER);
         Button createDependentButton = new Button("Create Dependent");
         createDependentButton.setPrefWidth(250);
         createDependentButton.setAlignment(Pos.CENTER);
@@ -59,7 +60,7 @@ public class AdminManager {
         // Add labels and fields to the grid pane
         gridPane.add(titleLabel, 0, 0);
         gridPane.add(policyOwnerButton, 0, 1);
-        gridPane.add(createPolicyHolderButton, 0, 2);
+        gridPane.add(PolicyHolderButton, 0, 2);
         gridPane.add(createDependentButton, 0, 3);
         gridPane.add(viewPolicyOwnersButton, 0, 4);
         gridPane.add(viewPolicyHoldersButton, 0, 5);
@@ -67,7 +68,7 @@ public class AdminManager {
         gridPane.add(logout, 0, 7);
 
         policyOwnerButton.setOnAction(e -> viewPolicyOwner());
-        createPolicyHolderButton.setOnAction(e -> createPolicyHolder());
+        PolicyHolderButton.setOnAction(e -> viewPolicyHolder());
         createDependentButton.setOnAction(e -> createDependent());
 
         return gridPane;
@@ -86,7 +87,7 @@ public class AdminManager {
             Button deleteButton = new Button("Delete");
             deleteButton.setOnAction(e -> deletePolicyOwner(policyOwner.getId()));
             Button editButton = new Button("Edit");
-
+            editButton.setOnAction(e -> editPolicyOwner(policyOwner.getId()));
             HBox policyOwnerBox = new HBox(10);
             policyOwnerBox.getChildren().addAll(label, editButton, deleteButton);
             vbox.getChildren().add(policyOwnerBox);
@@ -149,7 +150,7 @@ public class AdminManager {
             int searchCounter = 1;
             for (PolicyOwner policyOwner : policyOwners) {
                 if (policyOwner.getId().contains(searchText)) {
-                    Label label = new Label(searchCounter + ") " + policyOwner.toString());
+                    Label label = new Label(searchCounter + ") " + policyOwner);
                     Button deleteButton = new Button("Delete");
                     Button editButton = new Button("Edit");
                     vbox.getChildren().addAll(label, editButton, deleteButton);
@@ -191,6 +192,7 @@ public class AdminManager {
         gridPane.setPadding(new Insets(10, 10, 10, 10));
         gridPane.setVgap(5);
         gridPane.setHgap(5);
+        gridPane.setAlignment(Pos.CENTER);
 
         gridPane.add(idLabel, 0, 0);
         gridPane.add(idField, 1, 0);
@@ -235,8 +237,10 @@ public class AdminManager {
         Button exitButton = new Button("Exit");
         exitButton.setOnAction(e -> popupStage.close());
 
-        gridPane.add(submitButton, 1, 3);
-        gridPane.add(exitButton, 0, 3);
+        GridPane buttons = new GridPane();
+        buttons.add(exitButton, 0, 0);
+        buttons.add(submitButton, 1, 0);
+        gridPane.add(buttons, 1, 3);
 
         Scene popupScene = new Scene(gridPane, 300, 200);
         popupStage.setScene(popupScene);
@@ -244,27 +248,119 @@ public class AdminManager {
     }
 
     public void editPolicyOwner(String id) {
+        ArrayList<PolicyOwner> policyOwners = FileManager.policyOwnerReader();
+        ArrayList<Authentication> authentications = FileManager.authenticationReader();
+        for (PolicyOwner policyOwner : policyOwners) {
+            if (policyOwner.getId().equals(id)) {
+                for (Authentication authentication : authentications) {
+                    if (authentication.getId().equals(id)) {
+                        Stage popupStage = new Stage();
+                        popupStage.initModality(Modality.APPLICATION_MODAL);
+                        popupStage.setTitle("Edit Policy Owner");
 
+                        Label idLabel = new Label("ID (po-xxxxxx): ");
+                        Label passwordLabel = new Label("Password: ");
+                        Label fullNameLabel = new Label("Full Name: ");
+                        Label idValue = new Label(policyOwner.getId());
+
+                        TextField passwordField = new TextField();
+                        passwordField.setText(authentication.getPassword());
+                        TextField fullNameField = new TextField();
+                        fullNameField.setText(policyOwner.getFullName());
+
+                        GridPane gridPane = new GridPane();
+                        gridPane.setPadding(new Insets(10, 10, 10, 10));
+                        gridPane.setVgap(5);
+                        gridPane.setHgap(5);
+                        gridPane.setAlignment(Pos.CENTER);
+
+                        gridPane.add(idLabel, 0, 0);
+                        gridPane.add(idValue, 1, 0);
+                        gridPane.add(passwordLabel, 0, 1);
+                        gridPane.add(passwordField, 1, 1);
+                        gridPane.add(fullNameLabel, 0, 2);
+                        gridPane.add(fullNameField, 1, 2);
+
+                        Button submitButton = new Button("Submit");
+                        submitButton.setOnAction(e -> {
+                            policyOwner.setFullName(fullNameField.getText());
+                            authentication.setPassword(passwordField.getText());
+                            FileManager.policyOwnerWriter(policyOwners);
+                            FileManager.authenticationWriter(authentications);
+                            popupStage.close();
+                            viewPolicyOwner();
+                        });
+
+                        Button exitButton = new Button("exit");
+                        exitButton.setOnAction(e -> popupStage.close());
+
+                        GridPane buttons = new GridPane();
+                        buttons.add(submitButton, 0, 0);
+                        buttons.add(exitButton, 1, 0);
+
+                        gridPane.add(buttons, 1, 3);
+
+                        Scene popupScene = new Scene(gridPane, 300, 200);
+                        popupStage.setScene(popupScene);
+                        popupStage.showAndWait();
+                        return;
+                    }
+                }
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Policy Owner not found.");
+        alert.showAndWait();
     }
 
     public void deletePolicyOwner(String id) {
         ArrayList<PolicyOwner> policyOwners = FileManager.policyOwnerReader();
         ArrayList<Authentication> authentications = FileManager.authenticationReader();
+
+        // Search for the policy owner and authentication
+        PolicyOwner policyOwnerToDelete = null;
+        Authentication authenticationToDelete = null;
         for (PolicyOwner policyOwner : policyOwners) {
             if (policyOwner.getId().equals(id)) {
-                policyOwners.remove(policyOwner);
+                policyOwnerToDelete = policyOwner;
                 break;
             }
         }
         for (Authentication authentication : authentications) {
             if (authentication.getId().equals(id)) {
-                authentications.remove(authentication);
+                authenticationToDelete = authentication;
                 break;
             }
         }
-        FileManager.policyOwnerWriter(policyOwners);
-        FileManager.authenticationWriter(authentications);
-        viewPolicyOwner();
+
+        // If both objects are found, prompt for confirmation
+        if (policyOwnerToDelete != null && authenticationToDelete != null) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Delete Policy Owner");
+            alert.setContentText("Are you sure you want to delete this policy owner?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Remove the policy owner and authentication
+                policyOwners.remove(policyOwnerToDelete);
+                authentications.remove(authenticationToDelete);
+
+                // Write changes to files and update the view
+                FileManager.policyOwnerWriter(policyOwners);
+                FileManager.authenticationWriter(authentications);
+                viewPolicyOwner();
+            }
+        } else {
+            // If policy owner or authentication is not found, display an error message
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("Policy Owner not found.");
+            alert.showAndWait();
+        }
     }
     private boolean isIdPoExists(ArrayList<PolicyOwner> policyOwners, String id) {
         for (PolicyOwner policyOwner : policyOwners) {
@@ -273,6 +369,108 @@ public class AdminManager {
             }
         }
         return false;
+    }
+
+    public void viewPolicyHolder() {
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<Authentication> authentications = FileManager.authenticationReader();
+        // Create a VBox to hold the labels
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        for (PolicyHolder policyHolder : policyHolders) {
+            Label label = new Label(counter + ") " + policyHolder.toString());
+            Button deleteButton = new Button("Delete");
+//            deleteButton.setOnAction(e -> deletePolicyHolder(policyHolder.getId()));
+            Button editButton = new Button("Edit");
+//            editButton.setOnAction(e -> editPolicyHolder(policyHolder.getId()));
+            HBox policyHolderBox = new HBox(10);
+            policyHolderBox.getChildren().addAll(label, editButton, deleteButton);
+            vbox.getChildren().add(policyHolderBox);
+
+            counter++;
+        }
+
+        // Create a scroll pane
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+
+        // Create a search bar
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search by ID");
+        searchField.setPrefWidth(180);
+
+        // Create a search button
+        Button searchButton = new Button("Search");
+        searchButton.setPrefWidth(180);
+        searchButton.setOnAction(e -> searchPolicyHolder(policyHolders, searchField.getText(), vbox));
+
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode().toString().equals("ENTER")) {
+                searchPolicyHolder(policyHolders, searchField.getText(), vbox);
+            }
+        });
+
+        // Create a create button
+        Button createButton = new Button("Create policy holder");
+        createButton.setPrefWidth(180);
+        createButton.setOnAction(e -> createPolicyHolder());
+
+        // Create an exit button
+        Button exitButton = new Button("Exit");
+        exitButton.setPrefWidth(180);
+        exitButton.setOnAction(e -> UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300)));
+
+        // Create a grid pane
+        GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(10));
+        gridPane.setVgap(10);
+        gridPane.add(searchField, 0, 0);
+        gridPane.add(searchButton, 0, 1);
+        gridPane.add(createButton, 0, 2);
+        gridPane.add(exitButton, 0, 3);
+
+        // Create a BorderPane to hold the scroll pane and grid pane
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
+        borderPane.setCenter(scrollPane);
+        borderPane.setAlignment(searchField, Pos.TOP_CENTER);
+        borderPane.setRight(gridPane);
+
+        UserSession.getStage().setScene(new Scene(borderPane, 700, 450));
+    }
+
+    private void searchPolicyHolder(ArrayList<PolicyHolder> policyHolders, String searchText, VBox vbox) {
+        if (!searchText.isEmpty()) {
+            vbox.getChildren().clear();
+            int searchCounter = 1;
+            for (PolicyHolder policyHolder : policyHolders) {
+                if (policyHolder.getId().contains(searchText)) {
+                    Label label = new Label(searchCounter + ") " + policyHolder);
+                    Button deleteButton = new Button("Delete");
+                    Button editButton = new Button("Edit");
+                    HBox policyHolderBox = new HBox(10);
+                    policyHolderBox.getChildren().addAll(label, editButton, deleteButton);
+                    vbox.getChildren().add(policyHolderBox);
+                    searchCounter++;
+                }
+            }
+            if (vbox.getChildren().isEmpty()) {
+                Label label = new Label("No results found.");
+                vbox.getChildren().add(label);
+            }
+        } else {
+            vbox.getChildren().clear();
+            int counter = 1;
+            for (PolicyHolder policyHolder : policyHolders) {
+                Label label = new Label(counter + ") " + policyHolder.toString());
+                Button deleteButton = new Button("Delete");
+                Button editButton = new Button("Edit");
+                vbox.getChildren().addAll(label, editButton, deleteButton);
+                counter++;
+            }
+        }
     }
 
     public void createPolicyHolder() {
