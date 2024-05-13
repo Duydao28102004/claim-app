@@ -1,3 +1,4 @@
+
 package com.example.claimapp.Customer;
 
 import com.example.claimapp.Claim;
@@ -33,6 +34,6 @@ public class Dependent extends Customer {
 
     // Method to retrieve personal information
     public String retrievePersonalInfo() {
-        return "ID: " + getId() + ", Full Name: " + getFullName();
+        return "ID: " + getId() + ", Full Name: " + getFullName() + ", Insurance Card: " + getInsuranceCard();
     }
 }
