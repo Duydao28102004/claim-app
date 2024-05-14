@@ -100,17 +100,38 @@ public class InsuranceSurveyorController {
 
         InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
 
+        // Button to propose claim
         proposeClaimButton.setOnAction(e -> {
             String claimId = proposeClaimField.getText().trim();
+
             if (!claimId.isEmpty()) {
-                insuranceProcessManager.proposeClaim(claimId);
-                proposeLabel.setText("Claim " + claimId + " has been proposed.");
+                // Call the getSpecificClaim function to check the claim's current status
+                ProviderManager providerManager = new ProviderManager();
+                Claim claim = providerManager.getSpecificClaim(claimId);
+
+                if (claim != null) {
+                    if ("pending".equals(claim.getStatus())) {
+                        // Call the proposeClaim function from InsuranceProcessManager
+                        insuranceProcessManager.proposeClaim(claimId);
+
+                        // Display a message indicating success
+                        proposeLabel.setText("Claim " + claimId + " has been proposed.");
+                    } else {
+                        // Display a message indicating the claim is not in 'pending' status
+                        proposeLabel.setText("Cannot propose claim. Claim " + claimId + " is already in " + claim.getStatus() + " status.");
+                    }
+                } else {
+                    // Display a message indicating the claim was not found
+                    proposeLabel.setText("Claim " + claimId + " not found.");
+                }
                 gridPane.add(proposeLabel, 3, 5, 2, 1);
             } else {
+                // Display a message indicating that the claim ID is empty
                 proposeLabel.setText("Please enter a claim ID.");
                 gridPane.add(proposeLabel, 3, 5, 2, 1);
             }
         });
+
 
 
         // set action for the getClaimsButton

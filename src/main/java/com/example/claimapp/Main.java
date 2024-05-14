@@ -38,10 +38,10 @@ public class Main extends Application {
         InsuranceSurveyorController insuranceSurveyorController = new InsuranceSurveyorController();
         // Create scene and set it on the stage
         Scene scene = new Scene(authentication.loginPane(stage), 500, 300);
-        Scene scene2 = new Scene(insuranceManagerController.insuranceManagerPane(), 900, 600);
+        Scene scene2 = new Scene(insuranceManagerController.insuranceManagerPane(), 1100, 700);
         Scene scene3 = new Scene(insuranceSurveyorController.insuranceSurveyorPane(), 900, 600);
         stage.setTitle("Claim Management System - Authentication");
-        stage.setScene(scene3);
+        stage.setScene(scene2);
         stage.show();
     }
 

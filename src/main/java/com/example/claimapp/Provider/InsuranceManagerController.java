@@ -337,17 +337,31 @@ public class InsuranceManagerController {
             String claimId = processClaimField.getText().trim();
 
             if (!claimId.isEmpty()) {
-                // Call the proposeClaim function from InsuranceProcessManager
-                InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
-                insuranceProcessManager.processClaim(claimId, "Accepted");
+                // Call the getSpecificClaim function to check the claim's current status
+                ProviderManager providerManager = new ProviderManager();
+                Claim claim = providerManager.getSpecificClaim(claimId);
 
-                // Optionally, display a message indicating success
-                processClaimLabel.setText("Claim " + claimId + " has been Accepted.");
-                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+                if (claim != null) {
+                    if ("Processing".equals(claim.getStatus())) {
+                        // Call the processClaim function from InsuranceProcessManager
+                        InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
+                        insuranceProcessManager.processClaim(claimId, "Accepted");
+
+                        // Display a message indicating success
+                        processClaimLabel.setText("Claim " + claimId + " has been Accepted.");
+                    } else {
+                        // Display a message indicating the claim is not in 'Processing' status
+                        processClaimLabel.setText("Cannot process claim. Claim " + claimId + " is not in 'Processing' status.");
+                    }
+                } else {
+                    // Display a message indicating the claim was not found
+                    processClaimLabel.setText("Claim " + claimId + " not found.");
+                }
+                gridPane.add(processClaimLabel, 4, 6);
             } else {
-                // Optionally, display a message indicating that the claim ID is empty
+                // Display a message indicating that the claim ID is empty
                 processClaimLabel.setText("Please enter a claim ID.");
-                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+                gridPane.add(processClaimLabel, 4, 6);
             }
         });
 
@@ -356,19 +370,34 @@ public class InsuranceManagerController {
             String claimId = processClaimField.getText().trim();
 
             if (!claimId.isEmpty()) {
-                // Call the proposeClaim function from InsuranceProcessManager
-                InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
-                insuranceProcessManager.processClaim(claimId, "Rejected");
+                // Call the getSpecificClaim function to check the claim's current status
+                ProviderManager providerManager = new ProviderManager();
+                Claim claim = providerManager.getSpecificClaim(claimId);
 
-                // Optionally, display a message indicating success
-                processClaimLabel.setText("Claim " + claimId + " has been Rejected.");
-                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+                if (claim != null) {
+                    if ("Processing".equals(claim.getStatus())) {
+                        // Call the processClaim function from InsuranceProcessManager
+                        InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
+                        insuranceProcessManager.processClaim(claimId, "Rejected");
+
+                        // Display a message indicating success
+                        processClaimLabel.setText("Claim " + claimId + " has been Rejected.");
+                    } else {
+                        // Display a message indicating the claim is not in 'Processing' status
+                        processClaimLabel.setText("Cannot process claim. Claim " + claimId + " is not in 'Processing' status.");
+                    }
+                } else {
+                    // Display a message indicating the claim was not found
+                    processClaimLabel.setText("Claim " + claimId + " not found.");
+                }
+                gridPane.add(processClaimLabel, 4, 6);
             } else {
-                // Optionally, display a message indicating that the claim ID is empty
+                // Display a message indicating that the claim ID is empty
                 processClaimLabel.setText("Please enter a claim ID.");
-                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+                gridPane.add(processClaimLabel, 4, 6);
             }
         });
+
 
 
         // Set alignment of the GridPane to center
