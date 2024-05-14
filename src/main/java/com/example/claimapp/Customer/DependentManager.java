@@ -7,8 +7,17 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class DependentManager {
-    public GridPane dependentMenu(Stage stage) {
+
+    private Dependent dependent;
+
+    public DependentManager(Dependent dependent) {
+        this.dependent = dependent;
+    }
+
+    public Scene dependentMenu(Stage stage) {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
@@ -25,9 +34,24 @@ public class DependentManager {
         viewClaims.setPrefWidth(250);
         viewPersonalInfo.setPrefWidth(250);
 
+        // Handle view claims button click
+        viewClaims.setOnAction(event -> {
+            ArrayList<String> claims = dependent.retrieveClaims();
+            // Display or process the claims data as needed
+            System.out.println("Retrieved claims: " + claims);
+        });
+
+        // Handle view personal info button click
+        viewPersonalInfo.setOnAction(event -> {
+            String personalInfo = dependent.retrievePersonalInfo();
+            // Display or process the personal info data as needed
+            System.out.println("Personal Information: " + personalInfo);
+        });
+
         grid.add(viewClaims, 0, 1);
         grid.add(viewPersonalInfo, 0, 2);
 
-        return grid;
+        return new Scene(grid, 600, 400);
     }
 }
+
