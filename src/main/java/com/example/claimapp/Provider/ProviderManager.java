@@ -9,6 +9,9 @@ import com.example.claimapp.Customer.Dependent;
 import com.example.claimapp.Customer.PolicyHolder;
 import com.example.claimapp.FileManager;
 import com.example.claimapp.InsuranceCard;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -114,8 +117,7 @@ public class ProviderManager {
 
     void displayNewClaims(ArrayList<Claim> newClaims, GridPane gridPane) {
         // Step 1: Clear existing claims if any
-        InsuranceManagerController insuranceManagerController = new InsuranceManagerController();
-        insuranceManagerController.clearTextArea(gridPane);
+       clearTextArea(gridPane);
 
         // Step 2: Display each claim with a process button
         for (int i = 0; i < newClaims.size(); i++) {
@@ -137,5 +139,16 @@ public class ProviderManager {
         // Update the UI or database accordingly
     }
 
+    void clearTextArea(GridPane gridPane) {
+        ObservableList<Node> nodesToRemove = FXCollections.observableArrayList();
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) >= 7) {
+                // Remove the node if it is in the specified area of the grid pane
+                nodesToRemove.add(node);
+            }
+        }
+        // Remove all nodes in the specified area
+        gridPane.getChildren().removeAll(nodesToRemove);
+    }
 
 }

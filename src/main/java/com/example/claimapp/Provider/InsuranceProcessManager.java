@@ -55,7 +55,7 @@ public class InsuranceProcessManager {
                 manager.addSurveyor(String.valueOf(surveyor));
 
                 // Optionally, you can display a message indicating success
-                System.out.println("Surveyor added to manager: " + manager.getFullName());
+                System.out.println("Surveyor added to manager: " + manager.getId());
             } else {
                 // Optionally, display a message indicating that the surveyor was not found
                 System.out.println("Surveyor not found with ID: " + surveyorId);

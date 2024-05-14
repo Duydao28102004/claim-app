@@ -135,7 +135,7 @@ public class InsuranceManagerController {
 
         gridPane.setGridLinesVisible(false);
 
-
+        ProviderManager providerManager = new ProviderManager();
 
 
         addSurveyorButton.setOnAction(e -> {
@@ -157,7 +157,10 @@ public class InsuranceManagerController {
         getClaimsButton.setOnAction(e -> {
             // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
             ProviderManager dataRetriever = new ProviderManager();
-            ArrayList<Claim> Claims = dataRetriever.getAllClaims(); // Assuming getAllClaims() returns a List<Claim>
+            // Assuming getAllClaims() returns a List<Claim>
+            ArrayList<Claim> Claims = dataRetriever.getAllClaims();
+            // Clear existing text area before adding the sorted claims
+            providerManager.clearTextArea(gridPane);
 
             // Check if the claims list is empty
             if (Claims.isEmpty()) {
@@ -184,53 +187,37 @@ public class InsuranceManagerController {
         // Set action for the sortingChoiceBox
         sortingChoiceBox.setOnAction(e -> {
             String selectedSortOption = sortingChoiceBox.getValue();
+            ProviderManager dataRetriever = new ProviderManager();
+            ArrayList<Claim> sortedClaims = new ArrayList<>();
+
             switch (selectedSortOption) {
                 case "Latest to Earliest":
                     // Step 1: Retrieve all the claims from the database
-                    ProviderManager dataRetriever = new ProviderManager();
-
-                    // Step 2: Sort the claims from the latest to earliest creation date
-                    ArrayList<Claim> sortedClaimsLatestToEarliest = dataRetriever.claimLatestToEarliest();
-
-                    // Step 3: Format the sorted claims data into a suitable format for display on the UI
-                    StringBuilder formattedSortedClaims = new StringBuilder();
-                    for (Claim claim : sortedClaimsLatestToEarliest) {
-                        formattedSortedClaims.append(claim.toString()).append("\n");
-                    }
-
-                    // Step 4: Update the UI to display the formatted sorted claims data
-                    TextArea sortedClaimsTextArea = new TextArea();
-                    sortedClaimsTextArea.setText(formattedSortedClaims.toString());
-                    clearTextArea(gridPane); // Clear existing text area before adding the sorted claims
-                    gridPane.add(sortedClaimsTextArea, 0, 7, 2, 1);
+                    sortedClaims = dataRetriever.claimLatestToEarliest();
                     break;
 
                 case "Earliest to Latest":
-                    // Similar steps as above, but using claimEarliestToLatest function
                     // Step 1: Retrieve all the claims from the database
-                    dataRetriever = new ProviderManager();
-
-                    // Step 2: Sort the claims from the earliest to latest creation date
-                    ArrayList<Claim> sortedClaimsEarliestToLatest = dataRetriever.claimEarliestToLatest();
-
-                    // Step 3: Format the sorted claims data into a suitable format for display on the UI
-                    StringBuilder formattedSortedClaimsEarliestToLatest = new StringBuilder();
-                    for (Claim claim : sortedClaimsEarliestToLatest) {
-                        formattedSortedClaimsEarliestToLatest.append(claim.toString()).append("\n");
-                    }
-
-                    // Step 4: Update the UI to display the formatted sorted claims data
-                    TextArea sortedClaimsEarliestToLatestTextArea = new TextArea();
-                    sortedClaimsEarliestToLatestTextArea.setText(formattedSortedClaimsEarliestToLatest.toString());
-                    clearTextArea(gridPane); // Clear existing text area before adding the sorted claims
-                    gridPane.add(sortedClaimsEarliestToLatestTextArea, 0, 7, 2, 1);
+                    sortedClaims = dataRetriever.claimEarliestToLatest();
                     break;
+
                 default:
                     // Handle invalid selection
                     break;
             }
-        });
 
+
+            // Step 3: Format the sorted claims data into a suitable format for display on the UI
+            StringBuilder formattedSortedClaims = new StringBuilder();
+            for (Claim claim : sortedClaims) {
+                formattedSortedClaims.append(claim.toString()).append("\n");
+            }
+
+            // Step 4: Update the UI to display the formatted sorted claims data
+            TextArea sortedClaimsTextArea = new TextArea();
+            sortedClaimsTextArea.setText(formattedSortedClaims.toString());
+            gridPane.add(sortedClaimsTextArea, 0, 7, 2, 1);
+        });
 
 
         // set action for the getCustomersButton
@@ -238,6 +225,9 @@ public class InsuranceManagerController {
             // Step 1: Retrieve all the customers from the database (replace this with your actual database retrieval logic)
             ProviderManager dataRetriever = new ProviderManager();
             ArrayList<Customer> allCustomers = dataRetriever.getAllCustomers(); // Assuming getAllCustomers() returns a List<Customer>
+
+            // Clear existing text area before adding new claims
+            providerManager.clearTextArea(gridPane);
 
             // Step 2: Format the customers data into a suitable format for display on the UI
             StringBuilder formattedCustomers = new StringBuilder();
@@ -255,6 +245,7 @@ public class InsuranceManagerController {
         // Set action for the getSpecificClaimButton
         getSpecificClaimButton.setOnAction(e -> {
             String claimId = claimIdField.getText().trim();
+
             if (!claimId.isEmpty()) {
                 ProviderManager dataRetriever = new ProviderManager();
                 Claim specificClaim = dataRetriever.getSpecificClaim(claimId);
@@ -282,27 +273,27 @@ public class InsuranceManagerController {
         getSpecificCustomerButton.setOnAction(e -> {
             String customerId = customerIdField.getText().trim();
 
-           if (!customerId.isEmpty()) {
-               ProviderManager dataRetriever = new ProviderManager();
-               Customer specificCustomer = dataRetriever.getSpecificCustomer(customerId);
+            if (!customerId.isEmpty()) {
+                ProviderManager dataRetriever = new ProviderManager();
+                Customer specificCustomer = dataRetriever.getSpecificCustomer(customerId);
 
-               if (specificCustomer != null) {
-                   // Display the customer details
-                   TextArea customerTextArea = new TextArea();
-                   customerTextArea.setText("Customer Information:\n" + specificCustomer.toString());
-                   gridPane.add(customerTextArea, 0, 9, 2, 1);
-               } else {
-                   // Handle case where customer is not found
-                   TextArea customerNotFoundText = new TextArea();
-                   customerNotFoundText.setText("Customer with ID " + customerId + " not found.");
-                   gridPane.add(customerNotFoundText, 0, 9, 2, 1);
-               }
-           } else {
-               // Show an error message if claim ID field is empty
-               TextArea errorText = new TextArea();
-               errorText.setText("Please enter a valid Customer ID.");
-               gridPane.add(errorText, 0, 9, 3, 1);
-           }
+                if (specificCustomer != null) {
+                    // Display the customer details
+                    TextArea customerTextArea = new TextArea();
+                    customerTextArea.setText("Customer Information:\n" + specificCustomer.toString());
+                    gridPane.add(customerTextArea, 0, 9, 2, 1);
+                } else {
+                    // Handle case where customer is not found
+                    TextArea customerNotFoundText = new TextArea();
+                    customerNotFoundText.setText("Customer with ID " + customerId + " not found.");
+                    gridPane.add(customerNotFoundText, 0, 9, 2, 1);
+                }
+            } else {
+                // Show an error message if claim ID field is empty
+                TextArea errorText = new TextArea();
+                errorText.setText("Please enter a valid Customer ID.");
+                gridPane.add(errorText, 0, 9, 3, 1);
+            }
         });
 
         // set action for the getClaimsButton
@@ -338,7 +329,6 @@ public class InsuranceManagerController {
 
             if (!claimId.isEmpty()) {
                 // Call the getSpecificClaim function to check the claim's current status
-                ProviderManager providerManager = new ProviderManager();
                 Claim claim = providerManager.getSpecificClaim(claimId);
 
                 if (claim != null) {
@@ -371,7 +361,6 @@ public class InsuranceManagerController {
 
             if (!claimId.isEmpty()) {
                 // Call the getSpecificClaim function to check the claim's current status
-                ProviderManager providerManager = new ProviderManager();
                 Claim claim = providerManager.getSpecificClaim(claimId);
 
                 if (claim != null) {
@@ -396,25 +385,12 @@ public class InsuranceManagerController {
                 processClaimLabel.setText("Please enter a claim ID.");
                 gridPane.add(processClaimLabel, 4, 6);
             }
+
         });
-
-
 
         // Set alignment of the GridPane to center
         gridPane.setAlignment(Pos.CENTER);
         return gridPane;
-    }
-
-    void clearTextArea(GridPane gridPane) {
-        ObservableList<Node> nodesToRemove = FXCollections.observableArrayList();
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) >= 4) {
-                // Remove the node if it is in the specified area of the grid pane
-                nodesToRemove.add(node);
-            }
-        }
-        // Remove all nodes in the specified area
-        gridPane.getChildren().removeAll(nodesToRemove);
     }
 
 }
