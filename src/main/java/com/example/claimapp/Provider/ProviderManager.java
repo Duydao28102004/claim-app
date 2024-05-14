@@ -76,13 +76,13 @@ public class ProviderManager {
     }
 
 
-    public Customer getSpecificCustomer(String customerName) {
+    public Customer getSpecificCustomer(String customerId) {
         // Retrieve all customers using getAllCustomers function
         ArrayList<Customer> customers = getAllCustomers();
 
         // Iterate through the customers to find the specific customer
         for (Customer customer : customers) {
-            if (customer.getFullName().equals(customerName)) {
+            if (customer.getId().equals(customerId)) {
                 return customer; // Return the customer if found
             }
         }

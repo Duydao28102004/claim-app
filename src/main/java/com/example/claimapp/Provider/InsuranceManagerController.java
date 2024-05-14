@@ -58,8 +58,8 @@ public class InsuranceManagerController {
         Button getSpecificClaimButton = new Button("Get Specific Claim");
         getSpecificClaimButton.setPrefWidth(200);
 
-        Label specificCustomerLabel = new Label("Get specific customer:");
-        TextField customerNameField = new TextField();
+        Label specificCustomerLabel = new Label("Enter Customer ID:");
+        TextField customerIdField = new TextField();
         Button getSpecificCustomerButton = new Button("Get customer");
         getSpecificCustomerButton.setPrefWidth(200);
 
@@ -73,10 +73,15 @@ public class InsuranceManagerController {
         processClaimLabel.setStyle("-fx-font-size: 15px;");
         TextField processClaimField = new TextField();
         processClaimField.setPromptText("Enter Claim ID");
-        TextField processField = new TextField();
-        processField.setPromptText("Enter Status (Accepted/Rejected)");
-        Button processClaimButton = new Button("Process Claim");
-        processClaimButton.setPrefWidth(200);
+        Button acceptClaimButton = new Button("Accept");
+        acceptClaimButton.setPrefWidth(200);
+        Button rejectClaimButton = new Button("Reject");
+        rejectClaimButton.setPrefWidth(200);
+
+        Label surveyorsLabel = new Label("Get all surveyors:");
+        surveyorsLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
+        Button getSurveyorsButton = new Button("Get all surveyors");
+        getSurveyorsButton.setPrefWidth(200);
 
 
         // Add components to the grid pane
@@ -102,7 +107,7 @@ public class InsuranceManagerController {
         GridPane.setMargin(getSpecificClaimButton, buttonMargin);
 
         gridPane.add(specificCustomerLabel, 0, 4);
-        gridPane.add(customerNameField, 1, 4);
+        gridPane.add(customerIdField, 1, 4);
         gridPane.add(getSpecificCustomerButton, 2, 4);
         GridPane.setHalignment(getSpecificCustomerButton, javafx.geometry.HPos.RIGHT);
         GridPane.setMargin(getSpecificCustomerButton, buttonMargin);
@@ -114,65 +119,22 @@ public class InsuranceManagerController {
         addSurveyorButton.setPrefWidth(150);
 
 
+        gridPane.add(surveyorsLabel, 4, 5);
+        gridPane.add(getSurveyorsButton, 5, 5);
+        GridPane.setHalignment(getSurveyorsButton, javafx.geometry.HPos.RIGHT);
+        GridPane.setMargin(getSurveyorsButton, buttonMargin);
+
+        gridPane.add(processClaimLabel, 0, 6);
+        gridPane.add(processClaimField, 1, 6);
+        gridPane.add(acceptClaimButton, 2, 6);
+        gridPane.add(rejectClaimButton, 3, 6);
+        GridPane.setHalignment(acceptClaimButton, javafx.geometry.HPos.RIGHT);
+        GridPane.setMargin(acceptClaimButton, buttonMargin);
+        GridPane.setHalignment(rejectClaimButton, javafx.geometry.HPos.RIGHT);
+        GridPane.setMargin(rejectClaimButton, buttonMargin);
+
         gridPane.setGridLinesVisible(false);
 
-
-        InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
-
-
-        // Retrieve all claims from the database
-        ProviderManager providerManager = new ProviderManager();
-        List<Claim> allClaims = providerManager.getAllClaims();
-
-        // Filter claims to get only the ones with status "New"
-        List<Claim> newClaims = allClaims.stream()
-                .filter(claim -> claim.getStatus().equals("New"))
-                .toList();
-
-        // Clear existing text area before adding the new claims
-        clearTextArea(gridPane);
-
-        // Create a grid pane to contain the claim boxes
-        GridPane claimGridPane = new GridPane();
-        claimGridPane.setHgap(10); // Set horizontal gap between nodes
-        claimGridPane.setVgap(10); // Set vertical gap between nodes
-        claimGridPane.setPadding(new Insets(10)); // Set padding around the grid pane
-
-        // Display new claims with process button for each claim
-        int newRow = 0; // Choose the row index where you want to add the new components
-        for (Claim claim : newClaims) {
-            // Create a VBox to contain the claim information and process button
-            VBox claimBox = new VBox();
-            claimBox.setSpacing(10); // Set spacing between children
-            claimBox.setPrefWidth(1000); // Set preferred width for the VBox
-            claimBox.setPrefHeight(100); // Set preferred height for the VBox
-
-            // Add styling to create a grey border
-            claimBox.setStyle("-fx-border-color: grey; -fx-border-width: 1px; -fx-padding: 10px;");
-
-            // Create a label to display the claim information
-            Label claimLabel = new Label(claim.toString());
-
-            // Create a button for processing the claim
-            Button processButton = new Button("Process");
-            processButton.setOnAction(e -> providerManager.processClaim(claim));
-
-            // Add components to the VBox
-            claimBox.getChildren().addAll(claimLabel, processButton);
-
-            // Add the VBox to the GridPane
-            claimGridPane.add(claimBox, 0, newRow); // Span 2 columns for full width
-            newRow++; // Move to the next row for the next claim
-        }
-
-        // Set the content of the horizontal scroll pane to the grid pane
-        scrollPane.setContent(claimGridPane);
-
-        // Set horizontal scroll policy to "ALWAYS"
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        // Add the horizontal scroll pane to your layout
-        gridPane.add(scrollPane, 0, newRow, 11, 1); // Add it to the bottom of the grid pane
 
 
 
@@ -182,9 +144,10 @@ public class InsuranceManagerController {
 
             if (!managerId.isEmpty() && !surveyorId.isEmpty()) {
                 // Call the addSurveyorToManager method of InsuranceProcessManager
+                InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
                 insuranceProcessManager.addSurveyorToManager(managerId, surveyorId);
             } else {
-                // Optionally, display a message indicating that either the manager ID or surveyor ID is empty
+                // Display a message indicating that either the manager ID or surveyor ID is empty
                 System.out.println("Please enter both Manager ID and Surveyor ID.");
             }
         });
@@ -317,30 +280,96 @@ public class InsuranceManagerController {
 
         // Set action for the getCustomerButton
         getSpecificCustomerButton.setOnAction(e -> {
-            String customerName = customerNameField.getText();
+            String customerId = customerIdField.getText().trim();
 
-           if (!customerName.isEmpty()) {
+           if (!customerId.isEmpty()) {
                ProviderManager dataRetriever = new ProviderManager();
-               Customer specificCustomer = dataRetriever.getSpecificCustomer(customerName);
+               Customer specificCustomer = dataRetriever.getSpecificCustomer(customerId);
 
                if (specificCustomer != null) {
                    // Display the customer details
                    TextArea customerTextArea = new TextArea();
-                   customerTextArea.setText(specificCustomer.toString());
-                   gridPane.add(customerTextArea, 0, 10, 3, 1);
+                   customerTextArea.setText("Customer Information:\n" + specificCustomer.toString());
+                   gridPane.add(customerTextArea, 0, 9, 2, 1);
                } else {
                    // Handle case where customer is not found
-                   TextArea customerNotFoundTextArea = new TextArea();
-                   customerNotFoundTextArea.setText("Customer not found.");
-                   gridPane.add(customerNotFoundTextArea, 0, 10, 3, 1);
+                   TextArea customerNotFoundText = new TextArea();
+                   customerNotFoundText.setText("Customer with ID " + customerId + " not found.");
+                   gridPane.add(customerNotFoundText, 0, 9, 2, 1);
                }
            } else {
                // Show an error message if claim ID field is empty
                TextArea errorText = new TextArea();
-               errorText.setText("Please enter a valid Claim ID.");
-               gridPane.add(errorText, 0, 10, 3, 1);
+               errorText.setText("Please enter a valid Customer ID.");
+               gridPane.add(errorText, 0, 9, 3, 1);
            }
         });
+
+        // set action for the getClaimsButton
+        getSurveyorsButton.setOnAction(e -> {
+            // Step 1: Retrieve all the claims from the database (replace this with your actual database retrieval logic)
+            InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
+            ArrayList<InsuranceSurveyor> insuranceSurveyors = insuranceProcessManager.getAllSurveyors(); // Assuming getAllClaims() returns a List<Claim>
+
+            // Check if the claims list is empty
+            if (insuranceSurveyors.isEmpty()) {
+                // If there are no claims, display a message
+                TextArea noSurveyorsTextArea = new TextArea();
+                noSurveyorsTextArea.setText("There are no surveyors.");
+                gridPane.add(noSurveyorsTextArea, 0, 10, 2, 1);
+            } else {
+                // Step 2: Format the claims data into a suitable format for display on the UI
+                StringBuilder formattedSurveyors = new StringBuilder();
+                for (InsuranceSurveyor insuranceSurveyor: insuranceSurveyors) {
+                    formattedSurveyors.append(insuranceSurveyor.toString()).append("\n"); // Assuming toString() provides a suitable representation of the claim
+                }
+
+                // Step 3: Update the UI to display the formatted claims data
+                TextArea surveyorsTextArea = new TextArea();
+                surveyorsTextArea.setText(formattedSurveyors.toString());
+                // Assuming you have a GridPane named gridPane where you want to display the claims
+                gridPane.add(surveyorsTextArea, 0, 10, 2, 1);
+            }
+        });
+
+        // Button to accept claim
+        acceptClaimButton.setOnAction(event -> {
+            String claimId = processClaimField.getText().trim();
+
+            if (!claimId.isEmpty()) {
+                // Call the proposeClaim function from InsuranceProcessManager
+                InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
+                insuranceProcessManager.processClaim(claimId, "Accepted");
+
+                // Optionally, display a message indicating success
+                processClaimLabel.setText("Claim " + claimId + " has been Accepted.");
+                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+            } else {
+                // Optionally, display a message indicating that the claim ID is empty
+                processClaimLabel.setText("Please enter a claim ID.");
+                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+            }
+        });
+
+        // Button to reject claim
+        rejectClaimButton.setOnAction(event -> {
+            String claimId = processClaimField.getText().trim();
+
+            if (!claimId.isEmpty()) {
+                // Call the proposeClaim function from InsuranceProcessManager
+                InsuranceProcessManager insuranceProcessManager = new InsuranceProcessManager();
+                insuranceProcessManager.processClaim(claimId, "Rejected");
+
+                // Optionally, display a message indicating success
+                processClaimLabel.setText("Claim " + claimId + " has been Rejected.");
+                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+            } else {
+                // Optionally, display a message indicating that the claim ID is empty
+                processClaimLabel.setText("Please enter a claim ID.");
+                gridPane.add(processClaimLabel, 4, 6, 2, 1);
+            }
+        });
+
 
         // Set alignment of the GridPane to center
         gridPane.setAlignment(Pos.CENTER);
