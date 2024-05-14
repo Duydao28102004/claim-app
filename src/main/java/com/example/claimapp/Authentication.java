@@ -10,8 +10,52 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.Formattable;
+import java.util.Objects;
+
 public class Authentication {
-    public GridPane loginPane(Stage stage) {
+    private String id;
+    private String password;
+    private String userType;
+
+    public Authentication() {
+        this.id = "";
+        this.password = "";
+        this.userType = "";
+    }
+
+    public Authentication(String id, String password, String userType) {
+        this.id = id;
+        this.password = password;
+        this.userType = userType;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public GridPane loginPane() {
         // Create a grid pane
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(40));
@@ -26,8 +70,8 @@ public class Authentication {
 
         Label usernameLabel = new Label("Username:");
         usernameLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
-        TextField usernameField = new TextField();
-        usernameField.setPrefWidth(400);
+        TextField idField = new TextField();
+        idField.setPrefWidth(400);
         Label passwordLabel = new Label("Password:");
         passwordLabel.setStyle("-fx-font-size: 15px;"); // Optional styling
         PasswordField passwordField = new PasswordField();
@@ -44,7 +88,7 @@ public class Authentication {
         // Add components to the grid pane
         gridPane.add(titleLabel, 0, 0, 4, 1);
         gridPane.add(usernameLabel, 0, 1);
-        gridPane.add(usernameField, 1, 1, 3, 1);
+        gridPane.add(idField, 1, 1, 3, 1);
         gridPane.add(passwordLabel, 0, 2);
         gridPane.add(passwordField, 1, 2, 3, 1);
         gridPane.add(loginButton, 3, 3);
@@ -55,30 +99,40 @@ public class Authentication {
         Insets buttonMargin = new Insets(0, 10, 0, 0);
         GridPane.setMargin(loginButton, buttonMargin);
         gridPane.setGridLinesVisible(false);
-
+        ArrayList<Authentication> authList = FileManager.authenticationReader();
         // Set action for the login button
         loginButton.setOnAction(e -> {
             // Handle login action here
-            String username = usernameField.getText();
+            String id = idField.getText();
             String password = passwordField.getText();
-            // Validate username and password
-            if ("admin".equals(username)) {
-                if ("password".equals(password)) {
-                    // Open the policy owner menu
-                    PolicyOwnerManager policyOwnerManager = new PolicyOwnerManager();
-                    stage.setScene(new Scene(policyOwnerManager.policyOwnerMenu(stage), 500, 300));
+            for (Authentication authentication : authList) {
+                if (authentication.getId().equals(id)) {
+                    if (authentication.getPassword().equals(password)) {
+                        // Open the policy owner menu
+                        if (authentication.getUserType().equals("policyOwner")) {
+                            PolicyOwnerManager policyOwnerManager = new PolicyOwnerManager();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(policyOwnerManager.policyOwnerMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("admin")) {
+                            AdminManager adminManager = new AdminManager();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(adminManager.adminMenu(), 500, 300));
+                        } else {
+                            warningLabel.setText("Invalid user type. Please try again.");
+                        }
+                    } else {
+                        warningLabel.setText("Invalid password. Please try again.");
+                    }
                 } else {
-                    warningLabel.setText("Invalid password. Please try again.");
+                    warningLabel.setText("Invalid username. Please try again.");
                 }
-            } else {
-                warningLabel.setText("Invalid username. Please try again.");
             }
         });
 
         exitButton.setOnAction(e -> {
             // Handle exit action here
             System.out.println("Exiting...");
-            stage.close();
+            UserSession.getStage().close();
         });
 
         // Set alignment of the GridPane to center
