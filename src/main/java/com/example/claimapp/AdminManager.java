@@ -17,7 +17,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Formattable;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AdminManager {
     public GridPane adminMenu() {
@@ -36,9 +38,9 @@ public class AdminManager {
         Button addInsuranceCardButton = new Button("Add insurance card");
         addInsuranceCardButton.setPrefWidth(250);
         addInsuranceCardButton.setAlignment(Pos.CENTER);
-        Button viewPolicyHoldersButton = new Button("View Policy Holders");
-        viewPolicyHoldersButton.setPrefWidth(250);
-        viewPolicyHoldersButton.setAlignment(Pos.CENTER);
+        Button addDependentToPolicyHolderButton = new Button("Add dependent to policy holder");
+        addDependentToPolicyHolderButton.setPrefWidth(250);
+        addDependentToPolicyHolderButton.setAlignment(Pos.CENTER);
         Button viewDependentsButton = new Button("View Dependents");
         viewDependentsButton.setPrefWidth(250);
         viewDependentsButton.setAlignment(Pos.CENTER);
@@ -64,7 +66,7 @@ public class AdminManager {
         gridPane.add(PolicyHolderButton, 0, 2);
         gridPane.add(dependentButton, 0, 3);
         gridPane.add(addInsuranceCardButton, 0, 4);
-        gridPane.add(viewPolicyHoldersButton, 0, 5);
+        gridPane.add(addDependentToPolicyHolderButton, 0, 5);
         gridPane.add(viewDependentsButton, 0, 6);
         gridPane.add(logout, 0, 7);
 
@@ -72,6 +74,7 @@ public class AdminManager {
         PolicyHolderButton.setOnAction(e -> viewPolicyHolder());
         dependentButton.setOnAction(e -> viewDependent());
         addInsuranceCardButton.setOnAction(e -> addInsuranceCard());
+        addDependentToPolicyHolderButton.setOnAction(e -> addDependentToPolicyHolder());
 
         return gridPane;
     }
@@ -619,7 +622,7 @@ public class AdminManager {
     public void deletePolicyHolder(String id) {
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
         ArrayList<Authentication> authentications = FileManager.authenticationReader();
-
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
         // Search for the policy holder and authentication
         PolicyHolder policyHolderToDelete = null;
         Authentication authenticationToDelete = null;
@@ -635,9 +638,8 @@ public class AdminManager {
                 break;
             }
         }
-
         // If both objects are found, prompt for confirmation
-        if (policyHolderToDelete != null && authenticationToDelete != null) {
+        if (policyHolderToDelete != null || authenticationToDelete != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation");
             alert.setHeaderText("Delete Policy Holder");
@@ -649,7 +651,19 @@ public class AdminManager {
                 policyHolders.remove(policyHolderToDelete);
                 authentications.remove(authenticationToDelete);
 
+                // Remove policy holder in dependent
+                if (!policyHolderToDelete.getDependents().isEmpty()) {
+                    for (String dependentId : policyHolderToDelete.getDependents()) {
+                        for (Dependent dependent : dependents) {
+                            if (dependent.getId().equals(dependentId)) {
+                                dependent.setPolicyHolder("");
+                            }
+                        }
+                    }
+                }
+
                 // Write changes to files and update the view
+                FileManager.dependentWriter(dependents);
                 FileManager.policyHolderWriter(policyHolders);
                 FileManager.authenticationWriter(authentications);
                 viewPolicyHolder();
@@ -923,6 +937,7 @@ public class AdminManager {
     public void deleteDependent(String id) {
         ArrayList<Dependent> dependents = FileManager.dependentReader();
         ArrayList<Authentication> authentications = FileManager.authenticationReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
 
         // Search for the dependent and authentication
         Dependent dependentToDelete = null;
@@ -941,7 +956,7 @@ public class AdminManager {
         }
 
         // If both objects are found, prompt for confirmation
-        if (dependentToDelete != null && authenticationToDelete != null) {
+        if (dependentToDelete != null || authenticationToDelete != null) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Confirmation");
             alert.setHeaderText("Delete Dependent");
@@ -953,9 +968,22 @@ public class AdminManager {
                 dependents.remove(dependentToDelete);
                 authentications.remove(authenticationToDelete);
 
+                // Remove the dependent from the policy holder
+                if (!dependentToDelete.getPolicyHolder().equals("")) {
+                    for (PolicyHolder policyHolder: policyHolders) {
+                        for (String dependentId : policyHolder.getDependents()) {
+                            if (dependentId.equals(id)) {
+                                policyHolder.getDependents().remove(dependentId);
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 // Write changes to files and update the view
                 FileManager.dependentWriter(dependents);
                 FileManager.authenticationWriter(authentications);
+                FileManager.policyHolderWriter(policyHolders);
                 viewDependent();
             }
         } else {
@@ -1028,7 +1056,60 @@ public class AdminManager {
     }
 
     public void addDependentToPolicyHolder() {
-        ArrayList<Dependent> dependents = FileManager.dependentReader();
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        int counter = 1;
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+        for (PolicyHolder policyHolder : policyHolders) {
+            Label label = new Label(counter + ") " + policyHolder.toString());
+            Button selectButton = new Button("Select");
+            selectButton.setOnAction(e -> {
+                // Get the selected policy holder
+                PolicyHolder selectedPolicyHolder = policyHolder;
+
+                for (Dependent dependent : dependents) {
+                    if (selectedPolicyHolder.getDependents().contains(dependent.getId())) {
+                        dependents.remove(dependent);
+                    } else if (!dependent.getPolicyHolder().equals("")) {
+                        dependents.remove(dependent);
+                    }
+                }
+
+                // Update the VBox to display dependents of the selected policy holder
+                vbox.getChildren().clear();
+                int dependentCounter = 1;
+                for (Dependent dependent : dependents) {
+                    Label dependentLabel = new Label(dependentCounter + ") " + dependent.toString());
+                    HBox dependentBox = new HBox(10);
+                    Button selectDp = new Button("Select");
+                    selectDp.setOnAction(event -> {
+                        ArrayList<Dependent> dependents1= FileManager.dependentReader();
+                        for (Dependent dependent1 : dependents1) {
+                            if(Objects.equals(dependent.getId(), dependent1.getId())) {
+                                dependent1.setPolicyHolder(selectedPolicyHolder.getId());
+                            }
+                        }
+                        selectedPolicyHolder.getDependents().add(dependent.getId());
+                        FileManager.policyHolderWriter(policyHolders);
+                        FileManager.dependentWriter(dependents1);
+                        UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300));
+                    });
+                    dependentBox.getChildren().addAll(dependentLabel, selectDp);
+                    vbox.getChildren().add(dependentBox);
+                    dependentCounter++;
+                }
+            });
+            HBox policyHolderBox = new HBox(10);
+            policyHolderBox.getChildren().addAll(label, selectButton);
+            vbox.getChildren().add(policyHolderBox);
+            counter++;
+        }
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
+        borderPane.setCenter(scrollPane);
+        UserSession.getStage().setScene(new Scene(borderPane, 700, 450));
     }
 }
