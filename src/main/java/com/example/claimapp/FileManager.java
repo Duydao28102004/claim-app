@@ -293,7 +293,7 @@ public class FileManager {
         String deleteSql = "DELETE FROM InsuranceManager";
 
         // Then, insert new rows
-        String insertSql = "INSERT INTO InsuranceManager (id, fullName, phone, address, email, insuranceSurveyors) VALUES (?, ?, ?, ?)";
+        String insertSql = "INSERT INTO InsuranceManager (id, insuranceSurveyors) VALUES (?, ?, ?, ?)";
 
         try (
                 Connection conn = DriverManager.getConnection(jdbcUrl);
@@ -309,11 +309,7 @@ public class FileManager {
                 String surveyorsString = String.join(",", insuranceSurveyors);
 
                 insertStatement.setString(1, insuranceManager.getId());
-                insertStatement.setString(2, insuranceManager.getFullName());
-                insertStatement.setString(3, insuranceManager.getPhone());
-                insertStatement.setString(4, insuranceManager.getAddress());
-                insertStatement.setString(5, insuranceManager.getEmail());
-                insertStatement.setString(6, surveyorsString);
+                insertStatement.setString(2, surveyorsString);
 
                 insertStatement.addBatch(); // Add the prepared statement to the batch
             }
@@ -327,7 +323,7 @@ public class FileManager {
     public static ArrayList<InsuranceManager> insuranceManagerReader() {
         ArrayList<InsuranceManager> insuranceManagers = new ArrayList<>();
 
-        String selectSql = "SELECT id, fullName, phone, address, email, insuranceSurveyors FROM InsuranceManager";
+        String selectSql = "SELECT id, insuranceSurveyors FROM InsuranceManager";
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl);
              Statement statement = conn.createStatement();
@@ -335,15 +331,11 @@ public class FileManager {
 
             while (resultSet.next()) {
                 String id = resultSet.getString("id");
-                String fullName = resultSet.getString("fullName");
-                String phone = resultSet.getString("policyOwner");
-                String address = resultSet.getString("address");
-                String email = resultSet.getString("email");
                 String surveyorsString = resultSet.getString("insuranceSurveyors");
 
                 ArrayList<String> insuranceSurveyors = new ArrayList<>(Arrays.asList(surveyorsString.split(",")));
 
-                InsuranceManager insuranceManager = new InsuranceManager(id, fullName, phone, address, email, insuranceSurveyors);
+                InsuranceManager insuranceManager = new InsuranceManager(id, insuranceSurveyors);
                 insuranceManagers.add(insuranceManager);
 
             }
@@ -358,7 +350,7 @@ public class FileManager {
         String deleteSql = "DELETE FROM InsuranceSurveyor";
 
         // Then, insert new rows
-        String insertSql = "INSERT INTO Dependent (id, fullName, phone, address, email, insuranceManager) VALUES (?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO Dependent (id, insuranceManager) VALUES (?, ?, ?, ?, ?)";
 
         try (
                 Connection conn = DriverManager.getConnection(jdbcUrl);
@@ -372,11 +364,7 @@ public class FileManager {
             for (InsuranceSurveyor insuranceSurveyor : insuranceSurveyors) {
 
                 insertStatement.setString(1, insuranceSurveyor.getId());
-                insertStatement.setString(2, insuranceSurveyor.getFullName());
-                insertStatement.setString(3, insuranceSurveyor.getPhone());
-                insertStatement.setString(4, insuranceSurveyor.getAddress());
-                insertStatement.setString(5, insuranceSurveyor.getEmail());
-                insertStatement.setString(6, insuranceSurveyor.getManager());
+                insertStatement.setString(2, insuranceSurveyor.getManager());
 
                 insertStatement.addBatch(); // Add the prepared statement to the batch
             }
@@ -390,7 +378,7 @@ public class FileManager {
     public static ArrayList<InsuranceSurveyor> insuranceSurveyorReader() {
         ArrayList<InsuranceSurveyor> insuranceSurveyors = new ArrayList<>();
 
-        String selectSql = "SELECT id, fullName, phone, address, email, insuranceManager FROM InsuranceSurveyor";
+        String selectSql = "SELECT id, insuranceManager FROM InsuranceSurveyor";
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl);
              Statement statement = conn.createStatement();
@@ -398,15 +386,9 @@ public class FileManager {
 
             while (resultSet.next()) {
                 String id = resultSet.getString("id");
-                String fullName = resultSet.getString("fullName");
-                String phone = resultSet.getString("policyOwner");
-                String address = resultSet.getString("address");
-                String email = resultSet.getString("email");
                 String insuranceManager = resultSet.getString("insuranceManager");
 
-
-                InsuranceSurveyor insuranceSurveyor = new InsuranceSurveyor(id, fullName, phone, address, email, insuranceManager);
-
+                InsuranceSurveyor insuranceSurveyor = new InsuranceSurveyor(id, insuranceManager);
                 insuranceSurveyors.add(insuranceSurveyor);
             }
         } catch (SQLException e) {

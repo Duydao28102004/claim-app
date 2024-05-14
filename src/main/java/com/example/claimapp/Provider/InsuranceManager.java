@@ -6,13 +6,13 @@ public class InsuranceManager extends Provider{
 
     private ArrayList<String> insuranceSurveyors;
 
-    public InsuranceManager(String id, String fullName, String phone, String address, ArrayList<String> insuranceSurveyors) {
+    public InsuranceManager() {
         super();
         this.insuranceSurveyors = null;
     }
 
-    public InsuranceManager(String id, String fullName, String phone, String address, String email, ArrayList<String> insuranceSurveyors) {
-        super(id, fullName, phone, address, email);
+    public InsuranceManager(String id, ArrayList<String> insuranceSurveyors) {
+        super(id);
         this.insuranceSurveyors = insuranceSurveyors;
     }
 
@@ -27,10 +27,6 @@ public class InsuranceManager extends Provider{
     @Override
     public String toString() {
         return "InsuranceManager{" + getId() + '\'' +
-                ", fullName='" + getFullName() + '\'' +
-                ", phone='" + getPhone() + '\'' +
-                ", address='" + getAddress() + '\'' +
-                ", email='" + getEmail() + '\'' +
                 "insuranceSurveyors=" + insuranceSurveyors +
                 '}';
     }

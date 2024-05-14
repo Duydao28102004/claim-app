@@ -9,8 +9,8 @@ public class InsuranceSurveyor extends Provider{
         insuranceManager = "null";
     }
 
-    public InsuranceSurveyor(String id, String fullName, String phone, String address, String email, String insuranceManager) {
-        super(id, fullName, phone, address, email);
+    public InsuranceSurveyor(String id, String insuranceManager) {
+        super(id);
         this.insuranceManager = insuranceManager;
     }
 
