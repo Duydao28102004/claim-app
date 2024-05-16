@@ -55,6 +55,9 @@ public class PolicyOwnerManager {
         viewClaims.setPrefWidth(250);
         viewClaims.setAlignment(Pos.CENTER); // Align the button's content to the center
         policyOwnerMenu.add(viewClaims, 0, 3);
+        viewClaims.setOnAction( e -> {
+            viewClaim();
+        });
 
         javafx.scene.control.Button addInsuranceCards = new javafx.scene.control.Button("Add Insurance Card for Policy Holder and their dependent");
         addInsuranceCards.setPrefWidth(250);
@@ -477,5 +480,107 @@ public class PolicyOwnerManager {
         // Create a Scene with the GridPane
         Scene scene = new Scene(gridPane, 500, 300);
         UserSession.getStage().setScene(scene);
+    }
+
+    public void viewClaim() {
+        ArrayList<Claim> claims = FileManager.claimReader();
+        ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
+
+        // remove claim that is not associated with the policy owner
+        for (Claim claim : claims) {
+            if (!insuranceCards.stream().anyMatch(insuranceCard -> insuranceCard.getCardNumber().equals(claim.getCardNumber()))) {
+                claims.remove(claim);
+            }
+        }
+
+        // Create a VBox to hold the labels
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        // Add labels for each Claim
+        for (Claim claim : claims) {
+            HBox hBox = new HBox();
+            Label label = new Label(counter + ") " + claim.toString());
+            hBox.getChildren().addAll(label);
+            vbox.getChildren().add(hBox);
+            counter++;
+        }
+
+        // Create a ScrollPane and add the VBox to it
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+
+        // Create a search bar
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search by ID");
+
+        searchField.setPrefWidth(180);
+
+        // Create a search button
+        Button searchButton = new Button("Search");
+        searchButton.setPrefWidth(180);
+        searchButton.setOnAction(e -> searchClaim(claims, searchField.getText().trim(), vbox));
+
+        // Add event listener to trigger search when Enter key is pressed
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode().equals(KeyCode.ENTER)) {
+                searchClaim(claims, searchField.getText().trim(), vbox);
+            }
+        });
+
+        // Create an "Exit to Main Menu" button
+        Button exitButton = new Button("Exit to Main Menu");
+        exitButton.setPrefWidth(180);
+        exitButton.setOnAction(e -> {
+            UserSession.getStage().setScene(new Scene(policyOwnerMenu(), 500, 300));
+        });
+
+        GridPane gridPane = new GridPane();
+        gridPane.add(searchField, 0, 0);
+        gridPane.add(searchButton, 0, 1);
+        gridPane.add(exitButton, 0, 2);
+        // Create a BorderPane to hold the scroll pane, search bar, search button, and exit button
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
+        borderPane.setCenter(scrollPane);
+        borderPane.setAlignment(searchField, Pos.CENTER_LEFT);
+        borderPane.setRight(gridPane);
+
+        // Create a Scene with the BorderPane
+        Scene scene = new Scene(borderPane, 700, 450);
+
+        // Set the Scene to the Stage
+        UserSession.getStage().setScene(scene);
+    }
+    private void searchClaim(ArrayList<Claim> claims, String searchText, VBox vbox) {
+        if (!searchText.isEmpty()) {
+            vbox.getChildren().clear();
+            int searchCounter = 1;
+            for (Claim claim : claims) {
+                if (claim.getId().contains(searchText)) {
+                    HBox hBox = new HBox();
+                    Label label = new Label(searchCounter + ") " + claim.toString());
+                    hBox.getChildren().addAll(label);
+                    vbox.getChildren().add(hBox);
+                    searchCounter++;
+                }
+            }
+            if (vbox.getChildren().isEmpty()) {
+                Label label = new Label("No results found");
+                vbox.getChildren().add(label);
+            }
+        } else {
+            vbox.getChildren().clear();
+            int counter = 1;
+            for (Claim claim : claims) {
+                HBox hBox = new HBox();
+                Label label = new Label(counter + ") " + claim.toString());
+                hBox.getChildren().addAll(label);
+                vbox.getChildren().add(hBox);
+                counter++;
+            }
+        }
     }
 }
