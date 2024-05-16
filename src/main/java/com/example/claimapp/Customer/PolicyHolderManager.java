@@ -161,26 +161,26 @@ public class PolicyHolderManager {
             TextField bankingInfoField = new TextField();
             bankingInfoField.setPromptText("Banking Info");
 
-            grid.add(new Label("Claim ID:"), 0, 0);
-            grid.add(claimIdField, 1, 0);
-            grid.add(new Label("Claim Date:"), 0, 1);
-            grid.add(claimDateField, 1, 1);
-            grid.add(new Label("Insured Person:"), 0, 2);
-            grid.add(insuredPersonField, 1, 2);
-            grid.add(new Label("Card Number:"), 0, 3);
-            grid.add(cardNumberField, 1, 3);
-            grid.add(new Label("Exam Date:"), 0, 4);
-            grid.add(examDateField, 1, 4);
-            grid.add(new Label("Documents:"), 0, 5);
-            grid.add(documentsField, 1, 5);
-            grid.add(new Label("Claim Amount:"), 0, 6);
-            grid.add(claimAmountField, 1, 6);
-            grid.add(new Label("Status:"), 0, 7);
-            grid.add(statusField, 1, 7);
-            grid.add(new Label("Banking Info:"), 0, 8);
-            grid.add(bankingInfoField, 1, 8);
+            gridpane.add(new Label("Claim ID:"), 0, 0);
+            gridpane.add(claimIdField, 1, 0);
+            gridpane.add(new Label("Claim Date:"), 0, 1);
+            gridpane.add(claimDateField, 1, 1);
+            gridpane.add(new Label("Insured Person:"), 0, 2);
+            gridpane.add(insuredPersonField, 1, 2);
+            gridpane.add(new Label("Card Number:"), 0, 3);
+            gridpane.add(cardNumberField, 1, 3);
+            gridpane.add(new Label("Exam Date:"), 0, 4);
+            gridpane.add(examDateField, 1, 4);
+            gridpane.add(new Label("Documents:"), 0, 5);
+            gridpane.add(documentsField, 1, 5);
+            gridpane.add(new Label("Claim Amount:"), 0, 6);
+            gridpane.add(claimAmountField, 1, 6);
+            gridpane.add(new Label("Status:"), 0, 7);
+            gridpane.add(statusField, 1, 7);
+            gridpane.add(new Label("Banking Info:"), 0, 8);
+            gridpane.add(bankingInfoField, 1, 8);
 
-            dialog.getDialogPane().setContent(grid);
+            dialog.getDialogPane().setContent(gridpane);
 
             ButtonType updateButton = new ButtonType("Update", ButtonBar.ButtonData.OK_DONE);
             dialog.getDialogPane().getButtonTypes().addAll(updateButton, ButtonType.CANCEL);
