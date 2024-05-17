@@ -72,7 +72,7 @@ public class FileManager {
                 String claimsString = resultSet.getString("claims");
                 String dependentsString = resultSet.getString("dependents");
 
-                ArrayList<String> claims = new ArrayList<>(Arrays.asList(insuranceCard.split(",")));
+                ArrayList<String> claims = new ArrayList<>(Arrays.asList(claimsString.split(",")));
                 ArrayList<String> dependents = new ArrayList<>(Arrays.asList(dependentsString.split(",")));
 
                 PolicyHolder policyHolder = new PolicyHolder(id, fullName, insuranceCard, claims, dependents);
@@ -286,6 +286,109 @@ public class FileManager {
             e.printStackTrace();
         }
         return insuranceCards;
+    }
+
+    public static ArrayList<Authentication> authenticationReader() {
+        ArrayList<Authentication> authentications = new ArrayList<>();
+
+        String selectSql = "SELECT id, password, userType FROM Authentication";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String password = resultSet.getString("password");
+                String userType = resultSet.getString("userType");
+
+                Authentication authentication = new Authentication(id, password, userType);
+
+                authentications.add(authentication);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return authentications;
+    }
+
+    public static void authenticationWriter(ArrayList<Authentication> authentications) {
+        // First, delete all existing rows
+        String deleteSql = "DELETE FROM Authentication";
+
+        // Then, insert new rows
+        String insertSql = "INSERT INTO Authentication (id, password, userType) VALUES (?, ?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            // Execute the delete statement
+            deleteStatement.executeUpdate();
+
+            // Now, insert new rows
+            for (Authentication authentication : authentications) {
+                insertStatement.setString(1, authentication.getId());
+                insertStatement.setString(2, authentication.getPassword());
+                insertStatement.setString(3, authentication.getUserType());
+
+                insertStatement.addBatch(); // Add the prepared statement to the batch
+            }
+
+            insertStatement.executeBatch(); // Execute the batch of prepared statements
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<PolicyOwner> policyOwnerReader() {
+        ArrayList<PolicyOwner> policyOwners = new ArrayList<>();
+
+        String selectSql = "SELECT id, fullName FROM PolicyOwner";
+
+        try (Connection conn = DriverManager.getConnection(jdbcUrl);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(selectSql)) {
+
+            while (resultSet.next()) {
+                String id = resultSet.getString("id");
+                String fullName = resultSet.getString("fullName");
+
+                PolicyOwner policyOwner = new PolicyOwner(id, fullName);
+
+                policyOwners.add(policyOwner);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return policyOwners;
+    }
+
+    public static void policyOwnerWriter(ArrayList<PolicyOwner> policyOwners) {
+        String deleteSql = "DELETE FROM PolicyOwner";
+
+        String insertSql = "INSERT INTO PolicyOwner (id, fullName) VALUES (?, ?)";
+
+        try (
+                Connection conn = DriverManager.getConnection(jdbcUrl);
+                PreparedStatement deleteStatement = conn.prepareStatement(deleteSql);
+                PreparedStatement insertStatement = conn.prepareStatement(insertSql)
+        ) {
+            deleteStatement.executeUpdate();
+
+            for (PolicyOwner policyOwner : policyOwners) {
+                insertStatement.setString(1, policyOwner.getId());
+                insertStatement.setString(2, policyOwner.getFullName());
+
+                insertStatement.addBatch();
+            }
+
+            insertStatement.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void insuranceManagerWriter(ArrayList<InsuranceManager> insuranceManagers) {
