@@ -2,11 +2,13 @@ package com.example.claimapp.Provider;
 
 import com.example.claimapp.Claim;
 import com.example.claimapp.Customer.Customer;
+import com.example.claimapp.UserSession;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -20,10 +22,7 @@ import java.util.stream.Collectors;
 
 public class InsuranceManagerController {
 
-    public GridPane insuranceManagerPane() {
-        // Create a horizontal ScrollPane
-        ScrollPane scrollPane = new ScrollPane();
-
+    public GridPane insuranceManagerMenu() {
         // Create a grid pane
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(40));
@@ -134,6 +133,12 @@ public class InsuranceManagerController {
         GridPane.setMargin(rejectClaimButton, buttonMargin);
 
         gridPane.setGridLinesVisible(false);
+
+        // Create a Scene with the BorderPane
+        Scene scene = new Scene(gridPane, 700, 450);
+
+        // Set the Scene to the Stage
+        UserSession.getStage().setScene(scene);
 
         ProviderManager providerManager = new ProviderManager();
 

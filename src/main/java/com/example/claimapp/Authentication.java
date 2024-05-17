@@ -1,5 +1,7 @@
 package com.example.claimapp;
 
+import com.example.claimapp.Provider.InsuranceManager;
+import com.example.claimapp.Provider.InsuranceManagerController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,6 +15,7 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Formattable;
 import java.util.Objects;
+import com.example.claimapp.Provider.InsuranceManagerController;
 
 public class Authentication {
     private String id;
@@ -113,6 +116,10 @@ public class Authentication {
                             PolicyOwnerManager policyOwnerManager = new PolicyOwnerManager();
                             UserSession.setLoggedInUserId(id);
                             UserSession.getStage().setScene(new Scene(policyOwnerManager.policyOwnerMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("InsuranceManager")) {
+                            InsuranceManagerController insuranceManagerController = new InsuranceManagerController();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(insuranceManagerController.insuranceManagerMenu(), 500, 300));
                         } else if (authentication.getUserType().equals("admin")) {
                             AdminManager adminManager = new AdminManager();
                             UserSession.setLoggedInUserId(id);
