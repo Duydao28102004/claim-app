@@ -1,5 +1,7 @@
 package com.example.claimapp;
 
+import com.example.claimapp.Customer.DependentManager;
+import com.example.claimapp.Customer.PolicyHolderManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -117,6 +119,14 @@ public class Authentication {
                             AdminManager adminManager = new AdminManager();
                             UserSession.setLoggedInUserId(id);
                             UserSession.getStage().setScene(new Scene(adminManager.adminMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("dependent")) {
+                            DependentManager dependentManager = new DependentManager();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(dependentManager.dependentMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("policyHolder")) {
+                            PolicyHolderManager policyHolderManager = new PolicyHolderManager();
+                            UserSession.setLoggedInUserId(id);
+                            UserSession.getStage().setScene(new Scene(policyHolderManager.policyHolderMenu(), 500, 300));
                         } else {
                             warningLabel.setText("Invalid user type. Please try again.");
                         }

@@ -243,8 +243,6 @@ public class PolicyOwnerManager {
         for (Dependent dependent : dependents) {
             HBox hBox = new HBox();
             Label label = new Label(counter + ") " + dependent.toString());
-//            Button deleteButton = new Button("Delete");
-//            deleteButton.setOnAction(e -> deleteDependent(dependent, vbox));
             hBox.getChildren().addAll(label);
             vbox.getChildren().add(hBox);
             counter++;
@@ -305,8 +303,6 @@ public class PolicyOwnerManager {
                 if (dependent.getId().contains(searchText)) {
                     HBox hBox = new HBox();
                     Label label = new Label(searchCounter + ") " + dependent);
-//                    Button deleteButton = new Button("Delete");
-//                    deleteButton.setOnAction(e -> deleteDependent(dependent, vbox));
                     hBox.getChildren().addAll(label);
                     vbox.getChildren().add(hBox);
                     searchCounter++;
@@ -322,29 +318,11 @@ public class PolicyOwnerManager {
             for (Dependent dependent : dependents) {
                 HBox hBox = new HBox();
                 Label label = new Label(counter + ") " + dependent.toString());
-//                Button deleteButton = new Button("Delete");
-//                deleteButton.setOnAction(e -> deleteDependent(dependent, vbox));
                 hBox.getChildren().addAll(label);
                 vbox.getChildren().add(hBox);
                 counter++;
             }
         }
-    }
-
-    private void deleteDependent(Dependent dependent, VBox vbox) {
-        ArrayList<Dependent> dependents = FileManager.dependentReader();
-        ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
-        for (Dependent d : dependents) {
-            if (d.getId().equals(dependent.getId())) {
-                d.setInsuranceCard("");
-                break;
-            }
-        }
-        insuranceCards.removeIf(insuranceCard -> insuranceCard.getCardNumber().equals(dependent.getInsuranceCard()));
-        // Rebuild the UI without the deleted dependent
-        FileManager.dependentWriter(dependents);
-        FileManager.insuranceCardWriter(insuranceCards);
-        viewDependents();
     }
 
     public void addInsuranceCardForPolicyHolder() {
@@ -485,6 +463,8 @@ public class PolicyOwnerManager {
     public void viewClaim() {
         ArrayList<Claim> claims = FileManager.claimReader();
         ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
 
         // remove claim that is not associated with the policy owner
         for (Claim claim : claims) {
@@ -501,7 +481,30 @@ public class PolicyOwnerManager {
         // Add labels for each Claim
         for (Claim claim : claims) {
             HBox hBox = new HBox();
-            Label label = new Label(counter + ") " + claim.toString());
+            String personName = "";
+            if (claim.getInsuredPerson().contains("ph")) {
+                for (PolicyHolder policyHolder : policyHolders) {
+                    if (policyHolder.getId().equals(claim.getInsuredPerson())) {
+                        personName = policyHolder.getId() + " - " +  policyHolder.getFullName();
+                    }
+                }
+            } else {
+                for (Dependent dependent : dependents) {
+                    if (dependent.getId().equals(claim.getInsuredPerson())) {
+                        personName = dependent.getId() + " - " + dependent.getFullName();
+                    }
+                }
+            }
+            String display = counter + ") " + "Claim ID: " + claim.getId() + "\n" +
+                    "Insured Person" + personName + "\n" +
+                    "Claim Date: " + claim.getClaimDate() + "\n" +
+                    "Exam Date: " + claim.getExamDate() + "\n"+
+                    "Card Number: " + claim.getCardNumber() + "\n" +
+                    "Documents: " + claim.getDocuments() + "\n" +
+                    "Banking Info: " + claim.getBankingInfo() + "\n" +
+                    "Status: " + claim.getStatus() + "\n" +
+                    "Amount: " + claim.getClaimAmount();
+            Label label = new Label(display);
             hBox.getChildren().addAll(label);
             vbox.getChildren().add(hBox);
             counter++;

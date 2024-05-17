@@ -38,9 +38,9 @@ public class AdminManager {
         Button addDependentToPolicyHolderButton = new Button("Add dependent to policy holder");
         addDependentToPolicyHolderButton.setPrefWidth(250);
         addDependentToPolicyHolderButton.setAlignment(Pos.CENTER);
-        Button viewDependentsButton = new Button("View Dependents");
-        viewDependentsButton.setPrefWidth(250);
-        viewDependentsButton.setAlignment(Pos.CENTER);
+        Button removeDependentsFromPolicyHolderButton = new Button("Remove Dependents from policy holder");
+        removeDependentsFromPolicyHolderButton.setPrefWidth(250);
+        removeDependentsFromPolicyHolderButton.setAlignment(Pos.CENTER);
         javafx.scene.control.Button logout = new javafx.scene.control.Button("Logout");
         logout.setPrefWidth(250);
         logout.setStyle("-fx-background-color: red; -fx-text-fill: white;");
@@ -63,13 +63,14 @@ public class AdminManager {
         gridPane.add(PolicyHolderButton, 0, 2);
         gridPane.add(dependentButton, 0, 3);
         gridPane.add(addDependentToPolicyHolderButton, 0, 4);
-        gridPane.add(viewDependentsButton, 0, 5);
+        gridPane.add(removeDependentsFromPolicyHolderButton, 0, 5);
         gridPane.add(logout, 0, 6);
 
         policyOwnerButton.setOnAction(e -> viewPolicyOwner());
         PolicyHolderButton.setOnAction(e -> viewPolicyHolder());
         dependentButton.setOnAction(e -> viewDependent());
         addDependentToPolicyHolderButton.setOnAction(e -> addDependentToPolicyHolder());
+        removeDependentsFromPolicyHolderButton.setOnAction(e -> deleteDependentFromPolicyHolder());
 
         return gridPane;
     }
@@ -1066,6 +1067,47 @@ public class AdminManager {
             HBox policyHolderBox = new HBox(10);
             policyHolderBox.getChildren().addAll(label, selectButton);
             vbox.getChildren().add(policyHolderBox);
+            counter++;
+        }
+
+        Button exitButton = new Button("Exit");
+        exitButton.setOnAction(e -> UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300)));
+        exitButton.setPrefWidth(180);
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
+        borderPane.setCenter(scrollPane);
+        borderPane.setRight(exitButton);
+        UserSession.getStage().setScene(new Scene(borderPane, 700, 450));
+    }
+    public void deleteDependentFromPolicyHolder() {
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
+
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        for (Dependent dependent : dependents) {
+            Label label = new Label(counter + ") " + dependent.toString());
+            Button deleteButton = new Button("Delete");
+            deleteButton.setOnAction(e -> {
+                for (PolicyHolder policyHolder : policyHolders) {
+                    if (policyHolder.getDependents().contains(dependent.getId())) {
+                        policyHolder.getDependents().remove(dependent.getId());
+                    }
+                }
+                dependent.setPolicyHolder("");
+                dependent.setInsuranceCard("");
+                FileManager.policyHolderWriter(policyHolders);
+                FileManager.dependentWriter(dependents);
+                UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300));
+            });
+            HBox dependentBox = new HBox(10);
+            dependentBox.getChildren().addAll(label, deleteButton);
+            vbox.getChildren().add(dependentBox);
             counter++;
         }
 
