@@ -2,11 +2,8 @@ package com.example.claimapp.Customer;
 
 /**
  * @author <Dao Bao Duy - s3978826>
- *     Adapted from: chatGPT, w3schools
+ * Adapted from: chatGPT, w3schools
  */
-
-import com.example.claimapp.Claim;
-import com.example.claimapp.InsuranceCard;
 
 import java.util.ArrayList;
 
@@ -15,6 +12,7 @@ public class Customer {
     private String fullName;
     private String insuranceCard;
     private ArrayList<String> claims;
+
     public Customer() {
         id = "default";
         fullName = "default";

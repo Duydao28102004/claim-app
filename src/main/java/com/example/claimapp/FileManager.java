@@ -1,5 +1,6 @@
 package com.example.claimapp;
 
+import com.example.claimapp.Customer.Customer;
 import com.example.claimapp.Customer.Dependent;
 import com.example.claimapp.Customer.PolicyHolder;
 
@@ -9,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class FileManager {
+public class FileManager extends Customer {
     private static String jdbcUrl;
 
     public FileManager(String jdbcUrl) {

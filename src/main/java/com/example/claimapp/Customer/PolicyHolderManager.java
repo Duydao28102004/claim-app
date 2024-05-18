@@ -1,5 +1,6 @@
 package com.example.claimapp.Customer;
 
+import com.example.claimapp.Claim;
 import com.example.claimapp.FileManager;
 import com.example.claimapp.UserSession;
 import javafx.collections.FXCollections;
@@ -8,6 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -15,12 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-
-import com.example.claimapp.Claim;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 
 
 public class PolicyHolderManager {
@@ -49,7 +47,9 @@ public class PolicyHolderManager {
         Button viewDependentButton = new Button("view dependents");
         viewDependentButton.setPrefWidth(250);
         viewDependentButton.setAlignment(Pos.CENTER);
-        viewDependentButton.setOnAction(e -> {viewDependent();});
+        viewDependentButton.setOnAction(e -> {
+            viewDependent();
+        });
 
         Button logoutButton = new Button("Logout");
         logoutButton.setPrefWidth(250);
@@ -148,7 +148,6 @@ public class PolicyHolderManager {
         Label bankingInfoLabel = new Label("Banking Information(Bank name - Bank account name - Bank account number): ");
         TextField bankingInfoField = new TextField();
         bankingInfoField.setPrefWidth(400);
-
 
 
         Button submitButton = new Button("Submit");
@@ -297,7 +296,9 @@ public class PolicyHolderManager {
         Button backButton = new Button("Back");
         backButton.setPrefWidth(250);
         backButton.setAlignment(Pos.CENTER);
-        backButton.setOnAction(e -> {UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));});
+        backButton.setOnAction(e -> {
+            UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));
+        });
 
         ScrollPane scrollPane = new ScrollPane(vbox);
         scrollPane.setFitToWidth(true);
@@ -438,6 +439,7 @@ public class PolicyHolderManager {
         alert.setContentText("Claim with ID " + claimID + " not found.");
         alert.showAndWait();
     }
+
     public void viewDependent() {
         ArrayList<Dependent> dependents = FileManager.dependentReader();
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
@@ -459,7 +461,7 @@ public class PolicyHolderManager {
 
         int counter = 1;
         for (Dependent dependent : displayDependents) {
-            Label dependentLabel = new Label(counter + ") " +"Dependent: " + dependent.toString());
+            Label dependentLabel = new Label(counter + ") " + "Dependent: " + dependent.toString());
             Button updateButton = new Button("Update");
             updateButton.setOnAction(e -> editDependent(dependent.getId()));
             Button removeButton = new Button("Remove");
@@ -475,10 +477,14 @@ public class PolicyHolderManager {
         scrollPane.setFitToWidth(true);
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(e -> {UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));});
+        backButton.setOnAction(e -> {
+            UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));
+        });
 
         Button addDependent = new Button("Add dependent");
-        addDependent.setOnAction(e -> {addDependent();});
+        addDependent.setOnAction(e -> {
+            addDependent();
+        });
 
         GridPane gridPane = new GridPane();
         gridPane.add(backButton, 0, 0);

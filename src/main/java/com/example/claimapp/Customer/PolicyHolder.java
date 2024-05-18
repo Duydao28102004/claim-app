@@ -2,17 +2,15 @@ package com.example.claimapp.Customer;
 
 /**
  * @author <Dao Bao Duy - s3978826>
- *     Adapted from: chatGPT, w3schools
+ * Adapted from: chatGPT, w3schools
  */
-
-import com.example.claimapp.Claim;
-import com.example.claimapp.InsuranceCard;
 
 import java.util.ArrayList;
 
 
 public class PolicyHolder extends Customer {
     private ArrayList<String> dependents;
+
     public PolicyHolder() {
         super();
         dependents = null;
@@ -35,9 +33,9 @@ public class PolicyHolder extends Customer {
     public String toString() {
         return
                 "id: " + getId() + ' ' +
-                ", full name: " + getFullName() + ' ' +
-                ", insurance card: " + getInsuranceCard() + "\n " +
-                "    claims: " + getClaims() + "\n " +
-                "    dependents: " + dependents + ' ';
+                        ", full name: " + getFullName() + ' ' +
+                        ", insurance card: " + getInsuranceCard() + "\n " +
+                        "    claims: " + getClaims() + "\n " +
+                        "    dependents: " + dependents + ' ';
     }
 }

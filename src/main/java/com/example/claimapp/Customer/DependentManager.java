@@ -91,7 +91,9 @@ public class DependentManager {
         Button backButton = new Button("Back");
         backButton.setPrefWidth(250);
         backButton.setAlignment(Pos.CENTER);
-        backButton.setOnAction(e -> {UserSession.getStage().setScene(new Scene(dependentMenu(), 500, 300));});
+        backButton.setOnAction(e -> {
+            UserSession.getStage().setScene(new Scene(dependentMenu(), 500, 300));
+        });
 
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(titleLabel);
@@ -123,7 +125,9 @@ public class DependentManager {
                 Button backButton = new Button("Back");
                 backButton.setPrefWidth(250);
                 backButton.setAlignment(Pos.CENTER);
-                backButton.setOnAction(e -> {UserSession.getStage().setScene(new Scene(dependentMenu(), 500, 300));});
+                backButton.setOnAction(e -> {
+                    UserSession.getStage().setScene(new Scene(dependentMenu(), 500, 300));
+                });
 
 
                 GridPane gridPane = new GridPane();
