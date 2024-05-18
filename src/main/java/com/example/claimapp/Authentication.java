@@ -127,6 +127,12 @@ public class Authentication {
                             PolicyHolderManager policyHolderManager = new PolicyHolderManager();
                             UserSession.setLoggedInUserId(id);
                             UserSession.getStage().setScene(new Scene(policyHolderManager.policyHolderMenu(), 500, 300));
+                        } else if (authentication.getUserType().equals("insuranceSurveyor")) {
+                            InsuranceSurveyorManager insuranceSurveyorManager = new InsuranceSurveyorManager();
+                            insuranceSurveyorManager.insuranceSurveyorMenu();
+                        } else if (authentication.getUserType().equals("insuranceManager")) {
+                            InsuranceManagerManager insuranceManagerManager = new InsuranceManagerManager();
+                            insuranceManagerManager.insuranceManagerMenu();
                         } else {
                             warningLabel.setText("Invalid user type. Please try again.");
                         }

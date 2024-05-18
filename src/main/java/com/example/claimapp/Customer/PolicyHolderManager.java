@@ -32,6 +32,9 @@ public class PolicyHolderManager {
         Button informationOfPolicyHolderButton = new Button("Get information of policy holder");
         informationOfPolicyHolderButton.setPrefWidth(250);
         informationOfPolicyHolderButton.setAlignment(Pos.CENTER);
+        informationOfPolicyHolderButton.setOnAction(e -> {
+            informationOfPolicyHolder();
+        });
 
         Button createClaimButton = new Button("Create claim");
         createClaimButton.setPrefWidth(250);
@@ -43,9 +46,15 @@ public class PolicyHolderManager {
         viewClaimButton.setAlignment(Pos.CENTER);
         viewClaimButton.setOnAction(e -> viewClaim());
 
+        Button viewDependentButton = new Button("view dependents");
+        viewDependentButton.setPrefWidth(250);
+        viewDependentButton.setAlignment(Pos.CENTER);
+        viewDependentButton.setOnAction(e -> {viewDependent();});
+
         Button logoutButton = new Button("Logout");
         logoutButton.setPrefWidth(250);
         logoutButton.setAlignment(Pos.CENTER);
+        logoutButton.setStyle("-fx-background-color: red; -fx-text-fill: white;");
         logoutButton.setOnAction(e -> {
             // Handle logout action here
             System.out.println("Logging out...");
@@ -59,13 +68,47 @@ public class PolicyHolderManager {
         gridPane.add(informationOfPolicyHolderButton, 0, 1);
         gridPane.add(createClaimButton, 0, 2);
         gridPane.add(viewClaimButton, 0, 3);
-        gridPane.add(logoutButton, 0, 4);
+        gridPane.add(viewDependentButton, 0, 4);
+        gridPane.add(logoutButton, 0, 5);
 
         return gridPane;
     }
 
+    public void informationOfPolicyHolder() {
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+
+        Label titleLabel = new Label("Information of Policy Holder");
+        for (PolicyHolder policyHolder : policyHolders) {
+            if (policyHolder.getId().equals(UserSession.getLoggedInUserId())) {
+                Label idLabel = new Label("ID: " + policyHolder.getId());
+                Label fullNameLabel = new Label("Full Name: " + policyHolder.getFullName());
+                Label insuranceCardLabel = new Label("Insurance Card: " + policyHolder.getInsuranceCard());
+                Label claimsLabel = new Label("Claims: " + policyHolder.getClaims());
+                Label dependentsLabel = new Label("Dependents: " + policyHolder.getDependents());
+                GridPane gridPane = new GridPane();
+                gridPane.setAlignment(Pos.CENTER);
+                gridPane.setVgap(20);
+                gridPane.add(titleLabel, 0, 0, 2, 1);
+                gridPane.add(idLabel, 0, 1);
+                gridPane.add(fullNameLabel, 0, 2);
+                gridPane.add(insuranceCardLabel, 0, 3);
+                gridPane.add(claimsLabel, 0, 4);
+                gridPane.add(dependentsLabel, 0, 5);
+
+
+                Button backButton = new Button("Back to homepage");
+                backButton.setOnAction(e -> {
+                    UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));
+                });
+
+                gridPane.add(backButton, 0, 6);
+
+                UserSession.getStage().setScene(new Scene(gridPane, 500, 300));
+            }
+        }
+    }
+
     public void createClaim() {
-        ArrayList<Dependent> dependents = FileManager.dependentReader();
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
         ArrayList<Claim> claims = FileManager.claimReader();
 
@@ -241,7 +284,7 @@ public class PolicyHolderManager {
             Button updateButton = new Button("Update");
             updateButton.setOnAction(e -> updateClaim(claim.getId()));
             Button deleteButton = new Button("Delete");
-//            deleteButton.setOnAction(e -> deleteClaim(claim.getId()));
+            deleteButton.setOnAction(e -> deleteClaim(claim.getId()));
             GridPane button = new GridPane();
             button.add(updateButton, 0, 0);
             button.add(deleteButton, 1, 0);
@@ -393,6 +436,212 @@ public class PolicyHolderManager {
         alert.setTitle("Error");
         alert.setHeaderText("Claim not found");
         alert.setContentText("Claim with ID " + claimID + " not found.");
+        alert.showAndWait();
+    }
+    public void viewDependent() {
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<Dependent> displayDependents = new ArrayList<>();
+        for (PolicyHolder policyHolder : policyHolders) {
+            if (policyHolder.getId().equals(UserSession.getLoggedInUserId())) {
+                for (String dependentId : policyHolder.getDependents()) {
+                    for (Dependent dependent : dependents) {
+                        if (dependent.getId().equals(dependentId)) {
+                            displayDependents.add(dependent);
+                        }
+                    }
+                }
+            }
+        }
+
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        for (Dependent dependent : displayDependents) {
+            Label dependentLabel = new Label(counter + ") " +"Dependent: " + dependent.toString());
+            Button updateButton = new Button("Update");
+            updateButton.setOnAction(e -> editDependent(dependent.getId()));
+            Button removeButton = new Button("Remove");
+            removeButton.setOnAction(e -> removeDependent(dependent.getId()));
+            GridPane button = new GridPane();
+            button.add(updateButton, 0, 0);
+            button.add(removeButton, 1, 0);
+            vbox.getChildren().addAll(dependentLabel);
+            vbox.getChildren().add(button);
+        }
+
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {UserSession.getStage().setScene(new Scene(policyHolderMenu(), 500, 300));});
+
+        Button addDependent = new Button("Add dependent");
+        addDependent.setOnAction(e -> {addDependent();});
+
+        GridPane gridPane = new GridPane();
+        gridPane.add(backButton, 0, 0);
+        gridPane.add(addDependent, 1, 0);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(new Label("Dependent Information"));
+        borderPane.setCenter(scrollPane);
+        borderPane.setBottom(gridPane);
+
+
+        UserSession.getStage().setScene(new Scene(borderPane, 500, 300));
+    }
+
+    public void addDependent() {
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        ArrayList<Dependent> displayDependent = new ArrayList<>();
+        for (Dependent dependent : dependents) {
+            if (dependent.getPolicyHolder().equals("")) {
+                displayDependent.add(dependent);
+            }
+        }
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Add dependent");
+
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        for (Dependent dependent : displayDependent) {
+            Label dependentLabel = new Label(counter + ") Dependent: " + dependent.toString());
+            Button addButton = new Button("Add");
+            addButton.setOnAction(e -> {
+                for (PolicyHolder policyHolder : policyHolders) {
+                    if (policyHolder.getId().equals(UserSession.getLoggedInUserId())) {
+                        policyHolder.getDependents().add(dependent.getId());
+                        dependent.setPolicyHolder(UserSession.getLoggedInUserId());
+                        if (policyHolder.getInsuranceCard().equals("")) {
+                            dependent.setInsuranceCard(policyHolder.getInsuranceCard());
+                        }
+                        FileManager.policyHolderWriter(policyHolders);
+                        FileManager.dependentWriter(dependents);
+                        popupStage.close();
+                        viewDependent();
+                    }
+                }
+            });
+            vbox.getChildren().addAll(dependentLabel);
+            vbox.getChildren().add(addButton);
+            counter++;
+        }
+
+        ScrollPane scrollPane = new ScrollPane(vbox);
+        scrollPane.setFitToWidth(true);
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {
+            popupStage.close();
+            viewDependent();
+        });
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(new Label("Add dependent"));
+        borderPane.setCenter(scrollPane);
+        borderPane.setBottom(backButton);
+
+        Scene scene = new Scene(borderPane, 500, 300);
+        popupStage.setScene(scene);
+        popupStage.show();
+    }
+
+    public void editDependent(String id) {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Update Dependent");
+
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        for (Dependent dependent : dependents) {
+            if (dependent.getId().equals(id)) {
+                Label titleLabel = new Label("Edit Dependent");
+                titleLabel.setStyle("-fx-font-size: 30px; -fx-font-weight: bold;");
+                titleLabel.setAlignment(Pos.CENTER);
+                Label idLabel = new Label("ID: " + dependent.getId());
+                Label fullNameLabel = new Label("Full Name: ");
+                TextField fullNameField = new TextField();
+                fullNameField.setPrefWidth(400);
+                fullNameField.setText(dependent.getFullName());
+                Button updateButton = new Button("Update");
+                updateButton.setPrefWidth(100);
+                Button backButton = new Button("Back");
+                backButton.setPrefWidth(100);
+                Label warningLabel = new Label(); // Warning label for displaying error message
+                warningLabel.setStyle("-fx-text-fill: red;");
+
+                updateButton.setOnAction(e -> {
+                    if (fullNameField.getText().equals("")) {
+                        warningLabel.setText("Please enter the full name.");
+                        return;
+                    }
+                    for (Dependent dependentToUpdate : dependents) {
+                        if (dependentToUpdate.getId().equals(id)) {
+                            dependentToUpdate.setFullName(fullNameField.getText());
+                        }
+                    }
+                    FileManager.dependentWriter(dependents);
+                    popupStage.close();
+                    viewDependent();
+                });
+
+                backButton.setOnAction(e -> {
+                    popupStage.close();
+                    viewDependent();
+                });
+
+                GridPane gridPane = new GridPane();
+                gridPane.setAlignment(Pos.CENTER);
+                gridPane.setVgap(20);
+                gridPane.add(titleLabel, 0, 0, 2, 1);
+                gridPane.add(idLabel, 0, 1);
+                gridPane.add(fullNameLabel, 0, 2);
+                gridPane.add(fullNameField, 1, 2);
+                gridPane.add(updateButton, 0, 3);
+                gridPane.add(backButton, 1, 3);
+                gridPane.add(warningLabel, 0, 4, 2, 1);
+
+                Scene scene = new Scene(gridPane, 500, 300);
+                popupStage.setScene(scene);
+                popupStage.show();
+                viewDependent();
+            }
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Dependent not found");
+            alert.setContentText("Dependent with ID " + id + " not found.");
+            alert.showAndWait();
+        }
+    }
+
+    public void removeDependent(String id) {
+        ArrayList<Dependent> dependents = FileManager.dependentReader();
+        ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
+        for (PolicyHolder policyHolder : policyHolders) {
+            if (policyHolder.getId().equals(UserSession.getLoggedInUserId())) {
+                policyHolder.getDependents().remove(id);
+                FileManager.policyHolderWriter(policyHolders);
+                break;
+            }
+        }
+        for (Dependent dependent : dependents) {
+            if (dependent.getId().equals(id)) {
+                dependent.setPolicyHolder("");
+                dependent.setInsuranceCard("");
+                FileManager.dependentWriter(dependents);
+                viewDependent();
+                return;
+            }
+        }
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Dependent not found");
+        alert.setContentText("Dependent with ID " + id + " not found.");
         alert.showAndWait();
     }
 }
