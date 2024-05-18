@@ -120,12 +120,12 @@ public class Claim {
         return
                 "id='" + id + '\'' +
                 ", claimDate=" + claimDate +
-                ", insuredPerson:" + insuredPerson + '\'' +
+                ", insuredPerson:" + insuredPerson +
                 ", cardNumber:" + cardNumber + '\n' +
                 "examDate:" + examDate +
                 ", documents: " + documents +
                 ", claimAmount: " + claimAmount + "$" + "\n" +
                 "status: " + status + '\n' +
-                "bankingInfo='" + bankingInfo + '\'';
+                "bankingInfo='" + bankingInfo ;
     }
 }
