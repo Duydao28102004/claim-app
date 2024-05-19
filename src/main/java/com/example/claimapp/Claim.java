@@ -117,16 +117,15 @@ public class Claim {
 
     @Override
     public String toString() {
-        return "Claim{" +
+        return
                 "id='" + id + '\'' +
                 ", claimDate=" + claimDate +
-                ", insuredPerson='" + insuredPerson + '\'' +
-                ", cardNumber='" + cardNumber + '\'' +
-                ", examDate=" + examDate +
-                ", documents=" + documents +
-                ", claimAmount=" + claimAmount +
-                ", status='" + status + '\'' +
-                ", bankingInfo='" + bankingInfo + '\'' +
-                '}';
+                ", insuredPerson:" + insuredPerson +
+                ", cardNumber:" + cardNumber + '\n' +
+                "examDate:" + examDate +
+                ", documents: " + documents +
+                ", claimAmount: " + claimAmount + "$" + "\n" +
+                "status: " + status + '\n' +
+                "bankingInfo='" + bankingInfo ;
     }
 }

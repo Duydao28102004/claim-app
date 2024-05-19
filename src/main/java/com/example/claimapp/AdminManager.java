@@ -35,6 +35,9 @@ public class AdminManager {
         Button dependentButton = new Button("Dependent");
         dependentButton.setPrefWidth(250);
         dependentButton.setAlignment(Pos.CENTER);
+        Button claimButton = new Button("Claim");
+        claimButton.setPrefWidth(250);
+        claimButton.setAlignment(Pos.CENTER);
         Button addDependentToPolicyHolderButton = new Button("Add dependent to policy holder");
         addDependentToPolicyHolderButton.setPrefWidth(250);
         addDependentToPolicyHolderButton.setAlignment(Pos.CENTER);
@@ -62,17 +65,80 @@ public class AdminManager {
         gridPane.add(policyOwnerButton, 0, 1);
         gridPane.add(PolicyHolderButton, 0, 2);
         gridPane.add(dependentButton, 0, 3);
-        gridPane.add(addDependentToPolicyHolderButton, 0, 4);
-        gridPane.add(removeDependentsFromPolicyHolderButton, 0, 5);
-        gridPane.add(logout, 0, 6);
+        gridPane.add(claimButton, 0, 4);
+        gridPane.add(addDependentToPolicyHolderButton, 0, 5);
+        gridPane.add(removeDependentsFromPolicyHolderButton, 0, 6);
+        gridPane.add(logout, 0, 7);
 
         policyOwnerButton.setOnAction(e -> viewPolicyOwner());
         PolicyHolderButton.setOnAction(e -> viewPolicyHolder());
         dependentButton.setOnAction(e -> viewDependent());
         addDependentToPolicyHolderButton.setOnAction(e -> addDependentToPolicyHolder());
         removeDependentsFromPolicyHolderButton.setOnAction(e -> deleteDependentFromPolicyHolder());
+        claimButton.setOnAction(e -> viewClaim());
 
         return gridPane;
+    }
+
+    public void viewClaim() {
+        ArrayList<Claim> claims = FileManager.claimReader();
+
+        VBox vbox = new VBox();
+        vbox.setSpacing(10);
+
+        int counter = 1;
+        for (Claim claim : claims) {
+            Label claimLabel = new Label(counter + ") Claim: " + claim);
+            vbox.getChildren().add(claimLabel);
+        }
+
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search by ID");
+        Button searchButton = new Button("Search");
+        searchButton.setPrefWidth(180);
+        searchButton.setOnAction(e -> {
+            String searchID = searchField.getText();
+            vbox.getChildren().clear();
+            int searchCounter = 1;
+            for (Claim claim : claims) {
+                if (claim.getId().contains(searchID)) {
+                    Label claimLabel = new Label(searchCounter + ") Claim: " + claim);
+                    vbox.getChildren().add(claimLabel);
+                }
+            }
+            if (searchID.isEmpty()) {
+                viewClaim();
+            } else if (vbox.getChildren().isEmpty()) {
+                vbox.getChildren().clear();
+                Label notFoundLabel = new Label("Claim not found or already processed.");
+                vbox.getChildren().add(notFoundLabel);
+            }
+        });
+        searchField.setPrefWidth(180);
+        searchField.setOnKeyPressed(e -> {
+            if (e.getCode().toString().equals("ENTER")) {
+                searchButton.fire();
+            }
+        });
+
+        Button exitButton = new Button("exit");
+        exitButton.setPrefWidth(180);
+        exitButton.setOnAction(e -> {
+            UserSession.getStage().setScene(new Scene(adminMenu(), 500, 300));
+        });
+
+        GridPane buttons = new GridPane();
+        buttons.add(searchField, 0, 0);
+        buttons.add(searchButton, 0, 1);
+        buttons.add(exitButton, 0, 2);
+
+        ScrollPane scrollPane = new ScrollPane(vbox);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(scrollPane);
+        borderPane.setRight(buttons);
+
+        UserSession.getStage().setScene(new Scene(borderPane, 850, 550));
     }
 
     public void viewPolicyOwner() {
@@ -1084,7 +1150,6 @@ public class AdminManager {
     public void deleteDependentFromPolicyHolder() {
         ArrayList<Dependent> dependents = FileManager.dependentReader();
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
-        ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
 
         VBox vbox = new VBox();
         vbox.setSpacing(10);

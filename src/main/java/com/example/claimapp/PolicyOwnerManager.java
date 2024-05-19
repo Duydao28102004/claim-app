@@ -197,11 +197,11 @@ public class PolicyOwnerManager {
             if (p.getId().equals(policyHolder.getId())) {
                 for (Claim claim : claims) {
                     if (claim.getCardNumber().equals(p.getInsuranceCard())) {
-                       if (claim.getStatus().equals("processing")) {
+                       if (claim.getStatus().equals("Processing") || claim.getStatus().equals("Pending")) {
                            Alert alert = new Alert(Alert.AlertType.ERROR);
                            alert.setTitle("Error");
                            alert.setHeaderText("Unable to delete policy holder and their dependent insurance card");
-                           alert.setContentText("A claim associated with this policy holder is currently in processing state.");
+                           alert.setContentText("A claim associated with this policy holder is currently in pending or processing state.");
                            alert.showAndWait();
                            return;
                        }
@@ -467,9 +467,10 @@ public class PolicyOwnerManager {
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
 
         // remove claim that is not associated with the policy owner
+        ArrayList<Claim> displayClaim = new ArrayList<>();
         for (Claim claim : claims) {
-            if (!insuranceCards.stream().anyMatch(insuranceCard -> insuranceCard.getCardNumber().equals(claim.getCardNumber()))) {
-                claims.remove(claim);
+            if (insuranceCards.stream().anyMatch(insuranceCard -> insuranceCard.getCardNumber().equals(claim.getCardNumber()))) {
+                displayClaim.add(claim);
             }
         }
 
@@ -479,7 +480,7 @@ public class PolicyOwnerManager {
 
         int counter = 1;
         // Add labels for each Claim
-        for (Claim claim : claims) {
+        for (Claim claim : displayClaim) {
             HBox hBox = new HBox();
             String personName = "";
             if (claim.getInsuredPerson().contains("ph")) {
@@ -523,7 +524,7 @@ public class PolicyOwnerManager {
         // Create a search button
         Button searchButton = new Button("Search");
         searchButton.setPrefWidth(180);
-        searchButton.setOnAction(e -> searchClaim(claims, searchField.getText().trim(), vbox));
+        searchButton.setOnAction(e -> searchClaim(displayClaim, searchField.getText().trim(), vbox));
 
         // Add event listener to trigger search when Enter key is pressed
         searchField.setOnKeyPressed(e -> {
