@@ -329,19 +329,19 @@ public class PolicyOwnerManager {
         ArrayList<PolicyHolder> policyHolders = FileManager.policyHolderReader();
         ArrayList<InsuranceCard> insuranceCards = FileManager.insuranceCardReader();
 
+        ArrayList<PolicyHolder> displayPolicyHolders = new ArrayList<>();
         // remove policy holder that already have insurance card
         for (PolicyHolder policyHolder : policyHolders) {
-            if (!policyHolder.getInsuranceCard().equals("")) {
-                policyHolders.remove(policyHolder);
+            if (policyHolder.getInsuranceCard().equals("")) {
+                displayPolicyHolders.add(policyHolder);
             }
-
         }
 
         VBox vbox = new VBox();
         vbox.setSpacing(10);
 
         int counter = 1;
-        for (PolicyHolder policyHolder : policyHolders) {
+        for (PolicyHolder policyHolder : displayPolicyHolders) {
             HBox hbox = new HBox();
             Label label = new Label(counter + ")" + policyHolder.toString());
             Button addInsuranceCardButton = new Button("Add Insurance Card");
